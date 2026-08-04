@@ -1,0 +1,422 @@
+.contact-sales-page {
+  min-height: 100vh;
+  background: #f7f6ef;
+  color: #13211c;
+}
+
+.contact-sales-header {
+  display: flex;
+  width: min(1180px, calc(100% - 40px));
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 0 auto;
+  padding: 22px 0;
+}
+
+.contact-sales-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.contact-sales-brand > span {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 14px;
+  background: #176447;
+  color: white;
+  font-weight: 900;
+}
+
+.contact-sales-brand strong,
+.contact-sales-brand small {
+  display: block;
+}
+
+.contact-sales-brand small {
+  margin-top: 4px;
+  color: #718078;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.contact-sales-header nav {
+  display: flex;
+  gap: 24px;
+  color: #51615a;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.contact-sales-hero {
+  display: grid;
+  width: min(1180px, calc(100% - 40px));
+  grid-template-columns: 0.9fr 1.1fr;
+  align-items: center;
+  gap: 70px;
+  margin: 15px auto 0;
+  padding: 75px;
+  border-radius: 34px;
+  background:
+    radial-gradient(
+      circle at 15% 15%,
+      rgba(53, 168, 115, 0.28),
+      transparent 30%
+    ),
+    #0d3328;
+  color: white;
+}
+
+.contact-sales-copy > span,
+.sales-form > span,
+.contact-sales-details > div:first-child > span,
+.contact-sales-cta span {
+  color: #8fdbb3;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.contact-sales-copy h1 {
+  margin: 20px 0;
+  font-size: clamp(44px, 5.5vw, 68px);
+  letter-spacing: -0.06em;
+  line-height: 1;
+}
+
+.contact-sales-copy > p {
+  color: #bfd0c9;
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+.contact-benefits {
+  display: grid;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.contact-benefits article {
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.contact-benefits strong {
+  font-size: 13px;
+}
+
+.contact-benefits p {
+  margin: 5px 0 0;
+  color: #afc4bc;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.contact-form-wrapper {
+  min-width: 0;
+}
+
+.sales-form,
+.sales-success {
+  padding: 34px;
+  border-radius: 26px;
+  background: white;
+  color: #13211c;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.18);
+}
+
+.sales-form {
+  display: grid;
+  gap: 17px;
+}
+
+.sales-form > span {
+  color: #23845d;
+}
+
+.sales-form h2 {
+  margin: -5px 0 5px;
+  font-size: 31px;
+  letter-spacing: -0.04em;
+}
+
+.sales-form label {
+  display: grid;
+  gap: 8px;
+  color: #405149;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.sales-form input,
+.sales-form select,
+.sales-form textarea {
+  width: 100%;
+  padding: 0 13px;
+  border: 1px solid rgba(18, 69, 53, 0.15);
+  border-radius: 11px;
+  background: white;
+  font: inherit;
+}
+
+.sales-form input,
+.sales-form select {
+  height: 49px;
+}
+
+.sales-form textarea {
+  padding-top: 13px;
+  resize: vertical;
+}
+
+.sales-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 13px;
+}
+
+.sales-form > button {
+  min-height: 52px;
+  border: 0;
+  border-radius: 13px;
+  background: #176447;
+  color: white;
+  font-weight: 900;
+}
+
+.sales-form > small {
+  color: #819089;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.sales-success {
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+.sales-success > span {
+  display: grid;
+  width: 74px;
+  height: 74px;
+  place-items: center;
+  border-radius: 50%;
+  background: #dff5e9;
+  color: #176447;
+  font-size: 35px;
+  font-weight: 900;
+}
+
+.sales-success h2 {
+  margin: 22px 0 10px;
+  font-size: 32px;
+}
+
+.sales-success p {
+  color: #66736e;
+  line-height: 1.7;
+}
+
+.sales-success a,
+.sales-success button {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 12px;
+  font-weight: 900;
+}
+
+.sales-success a {
+  background: #176447;
+  color: white;
+}
+
+.sales-success button {
+  background: #eef7f2;
+  color: #176447;
+}
+
+.contact-sales-details {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 120px 0;
+}
+
+.contact-sales-details > div:first-child {
+  max-width: 760px;
+  margin-bottom: 40px;
+}
+
+.contact-sales-details > div:first-child > span {
+  color: #23845d;
+}
+
+.contact-sales-details h2,
+.contact-sales-cta h2 {
+  margin: 16px 0;
+  font-size: clamp(36px, 4.5vw, 55px);
+  letter-spacing: -0.05em;
+  line-height: 1.05;
+}
+
+.contact-audience-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.contact-audience-grid article {
+  min-height: 250px;
+  padding: 27px;
+  border: 1px solid rgba(18, 69, 53, 0.1);
+  border-radius: 22px;
+  background: white;
+}
+
+.contact-audience-grid strong {
+  display: block;
+  margin-top: 70px;
+  font-size: 19px;
+}
+
+.contact-audience-grid p {
+  color: #66736e;
+  line-height: 1.7;
+}
+
+.contact-sales-cta {
+  display: flex;
+  width: min(1180px, calc(100% - 40px));
+  align-items: center;
+  justify-content: space-between;
+  gap: 50px;
+  margin: 0 auto 80px;
+  padding: 65px;
+  border-radius: 30px;
+  background: #dff5e9;
+}
+
+.contact-sales-cta span {
+  color: #23845d;
+}
+
+.contact-sales-cta p {
+  max-width: 670px;
+  color: #66736e;
+  line-height: 1.7;
+}
+
+.contact-sales-cta > div:last-child {
+  display: grid;
+  min-width: 220px;
+  gap: 10px;
+}
+
+.contact-sales-cta a {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #176447;
+  color: white;
+  font-weight: 900;
+}
+
+.contact-sales-cta a:last-child {
+  border: 1px solid rgba(18, 69, 53, 0.16);
+  background: white;
+  color: #176447;
+}
+
+.contact-sales-footer {
+  display: grid;
+  width: min(1180px, calc(100% - 40px));
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+  gap: 20px;
+  margin: 0 auto;
+  padding: 45px 0;
+  border-top: 1px solid rgba(18, 69, 53, 0.1);
+  color: #66736e;
+  font-size: 12px;
+}
+
+.contact-sales-footer p {
+  text-align: center;
+}
+
+.contact-sales-footer > span {
+  text-align: right;
+}
+
+@media (max-width: 950px) {
+  .contact-sales-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-audience-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .contact-sales-cta {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .contact-sales-cta > div:last-child {
+    width: 100%;
+  }
+}
+
+@media (max-width: 650px) {
+  .contact-sales-header,
+  .contact-sales-hero,
+  .contact-sales-details,
+  .contact-sales-cta,
+  .contact-sales-footer {
+    width: min(100% - 24px, 1180px);
+  }
+
+  .contact-sales-header nav {
+    display: none;
+  }
+
+  .contact-sales-hero {
+    padding: 45px 22px;
+  }
+
+  .sales-form {
+    padding: 27px 20px;
+  }
+
+  .sales-form-grid,
+  .contact-audience-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-sales-cta {
+    padding: 42px 23px;
+  }
+
+  .contact-sales-footer {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-sales-footer p,
+  .contact-sales-footer > span {
+    text-align: left;
+  }
+}

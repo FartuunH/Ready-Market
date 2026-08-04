@@ -1,0 +1,653 @@
+.merchant-orders-page {
+  display: grid;
+  min-height: 100vh;
+  grid-template-columns: 250px minmax(0, 1fr);
+  background: #f3f6f4;
+  color: #13211c;
+}
+
+.merchant-orders-sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  padding: 25px 19px;
+  background: #08251d;
+  color: white;
+}
+
+.merchant-orders-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.merchant-orders-brand > span {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 13px;
+  background: #35a873;
+  color: white;
+  font-weight: 900;
+}
+
+.merchant-orders-brand strong,
+.merchant-orders-brand small {
+  display: block;
+}
+
+.merchant-orders-brand small {
+  margin-top: 4px;
+  color: #91aaa0;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.merchant-orders-sidebar nav {
+  display: grid;
+  gap: 7px;
+  margin-top: 42px;
+}
+
+.merchant-orders-sidebar nav a,
+.merchant-orders-sidebar nav button {
+  display: flex;
+  min-height: 43px;
+  align-items: center;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #afc6bd;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  text-align: left;
+}
+
+.merchant-orders-sidebar nav a:hover,
+.merchant-orders-sidebar nav button:hover,
+.merchant-orders-sidebar nav .merchant-sidebar-active {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.merchant-store-profile {
+  display: grid;
+  gap: 6px;
+  margin-top: auto;
+  padding: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.merchant-store-profile span,
+.merchant-store-profile small {
+  color: #91aaa0;
+  font-size: 9px;
+}
+
+.merchant-store-profile strong {
+  font-size: 12px;
+}
+
+.merchant-orders-main {
+  min-width: 0;
+  padding: 34px;
+}
+
+.merchant-orders-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+}
+
+.merchant-orders-header > div:first-child > span,
+.merchant-order-toolbar > div > span,
+.merchant-order-details-heading > div > span,
+.merchant-driver-information > span,
+.merchant-customer-notes > span,
+.merchant-order-timeline > span {
+  color: #23845d;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.merchant-orders-header h1 {
+  margin: 7px 0;
+  font-size: 37px;
+  letter-spacing: -0.045em;
+}
+
+.merchant-orders-header p {
+  margin: 0;
+  color: #6d7b75;
+}
+
+.merchant-orders-header-actions {
+  display: flex;
+  gap: 9px;
+}
+
+.merchant-orders-header-actions button,
+.merchant-orders-header-actions a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 15px;
+  border: 1px solid rgba(18, 69, 53, 0.12);
+  border-radius: 11px;
+  background: white;
+  color: #176447;
+  font-weight: 850;
+}
+
+.merchant-orders-header-actions a {
+  border-color: #176447;
+  background: #176447;
+  color: white;
+}
+
+.merchant-order-metrics {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 13px;
+  margin-top: 28px;
+}
+
+.merchant-order-metrics article {
+  display: grid;
+  gap: 9px;
+  padding: 20px;
+  border: 1px solid rgba(18, 69, 53, 0.08);
+  border-radius: 18px;
+  background: white;
+  box-shadow: 0 10px 28px rgba(8, 37, 29, 0.045);
+}
+
+.merchant-order-metrics span {
+  color: #6d7b75;
+  font-size: 11px;
+}
+
+.merchant-order-metrics strong {
+  font-size: 27px;
+}
+
+.merchant-order-metrics small {
+  color: #23845d;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.merchant-order-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(330px, 0.55fr);
+  align-items: start;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.merchant-order-list-panel,
+.merchant-order-details {
+  border: 1px solid rgba(18, 69, 53, 0.08);
+  border-radius: 21px;
+  background: white;
+  box-shadow: 0 12px 35px rgba(8, 37, 29, 0.045);
+}
+
+.merchant-order-list-panel {
+  min-width: 0;
+  padding: 25px;
+}
+
+.merchant-order-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.merchant-order-toolbar h2 {
+  margin: 6px 0 0;
+  font-size: 25px;
+}
+
+.merchant-order-toolbar input {
+  width: min(330px, 100%);
+  height: 43px;
+  padding: 0 13px;
+  border: 1px solid rgba(18, 69, 53, 0.13);
+  border-radius: 11px;
+  background: #f8faf9;
+}
+
+.merchant-order-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 22px;
+}
+
+.merchant-order-filters button {
+  min-height: 35px;
+  padding: 0 12px;
+  border: 1px solid rgba(18, 69, 53, 0.1);
+  border-radius: 999px;
+  background: white;
+  color: #65736d;
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.merchant-order-filters .merchant-filter-active {
+  border-color: #176447;
+  background: #176447;
+  color: white;
+}
+
+.merchant-orders-table-wrapper {
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
+.merchant-orders-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+.merchant-orders-table th,
+.merchant-orders-table td {
+  padding: 15px 12px;
+  border-bottom: 1px solid rgba(18, 69, 53, 0.08);
+  text-align: left;
+}
+
+.merchant-orders-table th {
+  color: #718078;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.merchant-orders-table td {
+  font-size: 12px;
+}
+
+.merchant-orders-table td strong,
+.merchant-orders-table td small {
+  display: block;
+}
+
+.merchant-orders-table td small {
+  margin-top: 4px;
+  color: #7b8983;
+  font-size: 9px;
+}
+
+.merchant-orders-table tbody tr {
+  cursor: pointer;
+  transition: background 160ms ease;
+}
+
+.merchant-orders-table tbody tr:hover,
+.merchant-order-row-selected {
+  background: #f0f8f4;
+}
+
+.merchant-orders-table td button {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 9px;
+  background: #e8f5ee;
+  color: #176447;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.merchant-order-status {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  padding: 0 9px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.merchant-status-new {
+  background: #e7f0ff;
+  color: #315c9c;
+}
+
+.merchant-status-preparing {
+  background: #fff4d6;
+  color: #8b6200;
+}
+
+.merchant-status-ready {
+  background: #e5f0ff;
+  color: #28659a;
+}
+
+.merchant-status-on-the-way {
+  background: #ece9ff;
+  color: #6041a2;
+}
+
+.merchant-status-completed {
+  background: #dff5e9;
+  color: #176447;
+}
+
+.merchant-status-cancelled {
+  background: #fde9e5;
+  color: #a4482b;
+}
+
+.merchant-orders-empty {
+  display: grid;
+  min-height: 250px;
+  place-items: center;
+  align-content: center;
+  text-align: center;
+}
+
+.merchant-orders-empty p {
+  color: #718078;
+}
+
+.merchant-order-details {
+  position: sticky;
+  top: 20px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.merchant-order-details-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.merchant-order-details-heading h2 {
+  margin: 6px 0 0;
+}
+
+.merchant-order-customer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.merchant-order-customer article,
+.merchant-driver-information,
+.merchant-customer-notes {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border-radius: 12px;
+  background: #f3f7f5;
+}
+
+.merchant-order-customer span {
+  color: #718078;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.merchant-order-customer small {
+  color: #6c7b74;
+  line-height: 1.45;
+}
+
+.merchant-order-items {
+  margin-top: 20px;
+}
+
+.merchant-order-items > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.merchant-order-items > div span {
+  color: #23845d;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.merchant-order-items > article {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(18, 69, 53, 0.08);
+}
+
+.merchant-order-items article div {
+  display: grid;
+  gap: 4px;
+}
+
+.merchant-order-items small {
+  color: #718078;
+}
+
+.merchant-order-financials {
+  display: grid;
+  gap: 9px;
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 13px;
+  background: #f8faf9;
+}
+
+.merchant-order-financials p {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  font-size: 11px;
+}
+
+.merchant-order-financials span {
+  color: #718078;
+}
+
+.merchant-order-total {
+  margin-top: 5px !important;
+  padding-top: 11px;
+  border-top: 1px solid rgba(18, 69, 53, 0.1);
+}
+
+.merchant-order-total span,
+.merchant-order-total strong {
+  color: #176447;
+  font-size: 13px;
+}
+
+.merchant-driver-information,
+.merchant-customer-notes,
+.merchant-order-timeline {
+  margin-top: 17px;
+}
+
+.merchant-driver-information > div {
+  display: grid;
+  gap: 5px;
+}
+
+.merchant-driver-information small {
+  color: #6d7b75;
+}
+
+.merchant-customer-notes p {
+  margin: 0;
+  color: #5f6f67;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.merchant-order-timeline {
+  display: grid;
+  gap: 9px;
+}
+
+.merchant-order-timeline > div {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.merchant-order-timeline > div > span {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 50%;
+  background: #dff5e9;
+  color: #176447;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.merchant-order-timeline strong {
+  font-size: 11px;
+}
+
+.merchant-order-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  margin-top: 20px;
+}
+
+.merchant-order-actions button {
+  min-height: 43px;
+  border: 0;
+  border-radius: 10px;
+  background: #176447;
+  color: white;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.merchant-order-actions button:nth-last-child(2) {
+  background: #e8f5ee;
+  color: #176447;
+}
+
+.merchant-order-actions .merchant-order-cancel {
+  background: #fde9e5;
+  color: #a4482b;
+}
+
+.merchant-demo-disclosure {
+  display: block;
+  margin-top: 17px;
+  color: #819089;
+  font-size: 9px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+@media (max-width: 1250px) {
+  .merchant-order-metrics {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .merchant-order-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .merchant-order-details {
+    position: static;
+    max-height: none;
+  }
+}
+
+@media (max-width: 850px) {
+  .merchant-orders-page {
+    grid-template-columns: 82px minmax(0, 1fr);
+  }
+
+  .merchant-orders-brand div,
+  .merchant-store-profile,
+  .merchant-orders-sidebar nav a,
+  .merchant-orders-sidebar nav button {
+    font-size: 0;
+  }
+
+  .merchant-orders-sidebar nav a,
+  .merchant-orders-sidebar nav button {
+    justify-content: center;
+  }
+
+  .merchant-orders-main {
+    padding: 24px 16px;
+  }
+
+  .merchant-orders-header,
+  .merchant-order-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .merchant-orders-header-actions {
+    width: 100%;
+  }
+
+  .merchant-orders-header-actions button,
+  .merchant-orders-header-actions a,
+  .merchant-order-toolbar input {
+    width: 100%;
+  }
+}
+
+@media (max-width: 620px) {
+  .merchant-orders-page {
+    display: block;
+  }
+
+  .merchant-orders-sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
+  }
+
+  .merchant-orders-sidebar nav,
+  .merchant-store-profile {
+    display: none;
+  }
+
+  .merchant-orders-brand div {
+    display: block;
+    font-size: initial;
+  }
+
+  .merchant-order-metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .merchant-order-customer,
+  .merchant-order-actions {
+    grid-template-columns: 1fr;
+  }
+}

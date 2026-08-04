@@ -1,0 +1,670 @@
+.marketing-page {
+  display: grid;
+  min-height: 100vh;
+  grid-template-columns: 250px minmax(0, 1fr);
+  background: #f3f6f4;
+  color: #13211c;
+}
+
+.marketing-sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  padding: 25px 19px;
+  background: #08251d;
+  color: white;
+}
+
+.marketing-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.marketing-brand > span {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 13px;
+  background: #35a873;
+  color: white;
+  font-weight: 900;
+}
+
+.marketing-brand strong,
+.marketing-brand small {
+  display: block;
+}
+
+.marketing-brand small {
+  margin-top: 4px;
+  color: #91aaa0;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.marketing-sidebar nav {
+  display: grid;
+  gap: 7px;
+  margin-top: 42px;
+}
+
+.marketing-sidebar nav a,
+.marketing-sidebar nav button {
+  display: flex;
+  min-height: 43px;
+  align-items: center;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #afc6bd;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  text-align: left;
+}
+
+.marketing-sidebar nav a:hover,
+.marketing-sidebar nav button:hover,
+.marketing-sidebar nav .marketing-nav-active {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.marketing-store-card {
+  display: grid;
+  gap: 6px;
+  margin-top: auto;
+  padding: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.marketing-store-card span,
+.marketing-store-card small {
+  color: #91aaa0;
+  font-size: 9px;
+}
+
+.marketing-store-card strong {
+  font-size: 12px;
+}
+
+.marketing-main {
+  min-width: 0;
+  padding: 34px;
+}
+
+.marketing-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+}
+
+.marketing-header > div:first-child > span,
+.marketing-toolbar > div > span,
+.marketing-details-heading > div > span,
+.marketing-offer-card > span,
+.marketing-preview-card > span,
+.marketing-ai-card > span {
+  color: #23845d;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.marketing-header h1 {
+  margin: 7px 0;
+  font-size: 37px;
+  letter-spacing: -0.045em;
+}
+
+.marketing-header p {
+  margin: 0;
+  color: #6d7b75;
+}
+
+.marketing-header-actions {
+  display: flex;
+  gap: 9px;
+}
+
+.marketing-header-actions button {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgba(18, 69, 53, 0.12);
+  border-radius: 11px;
+  background: white;
+  color: #176447;
+  font-weight: 850;
+}
+
+.marketing-header-actions .marketing-create-button {
+  border-color: #176447;
+  background: #176447;
+  color: white;
+}
+
+.marketing-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.marketing-metrics article,
+.marketing-list-panel,
+.marketing-details-panel {
+  border: 1px solid rgba(18, 69, 53, 0.08);
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 10px 30px rgba(8, 37, 29, 0.045);
+}
+
+.marketing-metrics article {
+  display: grid;
+  gap: 9px;
+  padding: 22px;
+}
+
+.marketing-metrics span {
+  color: #6d7b75;
+  font-size: 11px;
+}
+
+.marketing-metrics strong {
+  font-size: 27px;
+}
+
+.marketing-metrics small {
+  color: #23845d;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.marketing-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(330px, 0.55fr);
+  align-items: start;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.marketing-list-panel {
+  min-width: 0;
+  padding: 25px;
+}
+
+.marketing-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.marketing-toolbar h2 {
+  margin: 6px 0 0;
+}
+
+.marketing-search-filters {
+  display: flex;
+  gap: 9px;
+}
+
+.marketing-search-filters input {
+  width: 320px;
+}
+
+.marketing-search-filters input,
+.marketing-search-filters select,
+.marketing-modal input,
+.marketing-modal select {
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid rgba(18, 69, 53, 0.13);
+  border-radius: 10px;
+  background: #f8faf9;
+}
+
+.marketing-table-wrapper {
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
+.marketing-table {
+  width: 100%;
+  min-width: 860px;
+  border-collapse: collapse;
+}
+
+.marketing-table th,
+.marketing-table td {
+  padding: 14px 11px;
+  border-bottom: 1px solid rgba(18, 69, 53, 0.08);
+  text-align: left;
+}
+
+.marketing-table th {
+  color: #718078;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.marketing-table td {
+  font-size: 11px;
+}
+
+.marketing-table td strong,
+.marketing-table td small {
+  display: block;
+}
+
+.marketing-table td small {
+  margin-top: 4px;
+  color: #718078;
+}
+
+.marketing-table tbody tr:hover,
+.marketing-row-selected {
+  background: #f0f8f4;
+}
+
+.marketing-table td button {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: #e8f5ee;
+  color: #176447;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.marketing-status {
+  display: inline-flex;
+  min-height: 27px;
+  align-items: center;
+  padding: 0 9px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.marketing-status-active {
+  background: #dff5e9;
+  color: #176447;
+}
+
+.marketing-status-scheduled {
+  background: #e7f0ff;
+  color: #315c9c;
+}
+
+.marketing-status-draft {
+  background: #eef0f2;
+  color: #5f6970;
+}
+
+.marketing-status-completed {
+  background: #fff4d6;
+  color: #8b6200;
+}
+
+.marketing-empty {
+  display: grid;
+  min-height: 220px;
+  place-items: center;
+  align-content: center;
+  text-align: center;
+}
+
+.marketing-empty p {
+  color: #718078;
+}
+
+.marketing-details-panel {
+  position: sticky;
+  top: 20px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 23px;
+}
+
+.marketing-details-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.marketing-details-heading h2 {
+  margin: 6px 0;
+}
+
+.marketing-details-heading small {
+  color: #718078;
+}
+
+.marketing-offer-card,
+.marketing-preview-card,
+.marketing-ai-card {
+  display: grid;
+  gap: 8px;
+  margin-top: 17px;
+  padding: 16px;
+  border-radius: 13px;
+}
+
+.marketing-offer-card {
+  background: #eef7f2;
+}
+
+.marketing-offer-card strong {
+  color: #176447;
+  font-size: 23px;
+}
+
+.marketing-offer-card p {
+  margin: 0;
+  color: #66736e;
+}
+
+.marketing-campaign-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  margin-top: 17px;
+}
+
+.marketing-campaign-summary article {
+  display: grid;
+  gap: 7px;
+  padding: 13px;
+  border-radius: 11px;
+  background: #f3f7f5;
+}
+
+.marketing-campaign-summary span {
+  color: #718078;
+  font-size: 9px;
+}
+
+.marketing-campaign-summary strong {
+  color: #176447;
+  font-size: 20px;
+}
+
+.marketing-date-card {
+  display: grid;
+  gap: 10px;
+  margin-top: 17px;
+  padding: 15px;
+  border-radius: 12px;
+  background: #f8faf9;
+}
+
+.marketing-date-card p {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  font-size: 11px;
+}
+
+.marketing-date-card span {
+  color: #718078;
+}
+
+.marketing-preview-card {
+  background: #f7f6ef;
+}
+
+.marketing-preview-card > div {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 12px;
+  background: white;
+}
+
+.marketing-preview-card small {
+  color: #718078;
+}
+
+.marketing-preview-card p {
+  margin: 0;
+  color: #176447;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.marketing-preview-card button {
+  min-height: 40px;
+  border: 0;
+  border-radius: 9px;
+  background: #176447;
+  color: white;
+  font-weight: 900;
+}
+
+.marketing-ai-card {
+  background: #0d3328;
+  color: white;
+}
+
+.marketing-ai-card > span {
+  color: #8fdbb3;
+}
+
+.marketing-ai-card p {
+  margin: 0;
+  color: #bfd0c9;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.marketing-details-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.marketing-details-actions button {
+  min-height: 41px;
+  border: 0;
+  border-radius: 9px;
+  background: #e8f5ee;
+  color: #176447;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.marketing-details-actions button:first-child {
+  background: #176447;
+  color: white;
+}
+
+.marketing-details-actions .marketing-delete-button {
+  background: #fde9e5;
+  color: #a4482b;
+}
+
+.marketing-disclosure {
+  display: block;
+  margin-top: 16px;
+  color: #819089;
+  font-size: 9px;
+  text-align: center;
+}
+
+.marketing-modal-overlay {
+  position: fixed;
+  z-index: 300;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(4, 25, 18, 0.72);
+}
+
+.marketing-modal {
+  position: relative;
+  display: grid;
+  width: min(540px, 100%);
+  max-height: calc(100vh - 40px);
+  gap: 16px;
+  overflow-y: auto;
+  padding: 34px;
+  border-radius: 25px;
+  background: white;
+}
+
+.marketing-modal > span {
+  color: #23845d;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.marketing-modal h2 {
+  margin: -4px 0;
+}
+
+.marketing-modal label {
+  display: grid;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.marketing-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.marketing-save-button {
+  min-height: 49px;
+  border: 0;
+  border-radius: 11px;
+  background: #176447;
+  color: white;
+  font-weight: 900;
+}
+
+.marketing-modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: #eef5f1;
+  color: #176447;
+  font-size: 22px;
+}
+
+.marketing-modal > small {
+  color: #819089;
+  text-align: center;
+}
+
+@media (max-width: 1200px) {
+  .marketing-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .marketing-details-panel {
+    position: static;
+    max-height: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .marketing-page {
+    grid-template-columns: 82px minmax(0, 1fr);
+  }
+
+  .marketing-brand div,
+  .marketing-store-card {
+    display: none;
+  }
+
+  .marketing-sidebar nav a,
+  .marketing-sidebar nav button {
+    justify-content: center;
+    font-size: 0;
+  }
+
+  .marketing-metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .marketing-toolbar,
+  .marketing-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .marketing-search-filters {
+    width: 100%;
+  }
+
+  .marketing-search-filters input,
+  .marketing-search-filters select {
+    width: 100%;
+  }
+}
+
+@media (max-width: 650px) {
+  .marketing-page {
+    display: block;
+  }
+
+  .marketing-sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
+  }
+
+  .marketing-sidebar nav,
+  .marketing-store-card {
+    display: none;
+  }
+
+  .marketing-brand div {
+    display: block;
+  }
+
+  .marketing-main {
+    padding: 22px 14px;
+  }
+
+  .marketing-header-actions,
+  .marketing-search-filters {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .marketing-header-actions button,
+  .marketing-search-filters input,
+  .marketing-search-filters select {
+    width: 100%;
+  }
+
+  .marketing-metrics,
+  .marketing-campaign-summary,
+  .marketing-details-actions,
+  .marketing-form-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,732 @@
+.driver-auth-page,
+.driver-dashboard {
+  min-height: 100vh;
+  background: #f3f6f4;
+  color: #13211c;
+}
+
+.driver-simple-header {
+  display: flex;
+  width: min(1180px, calc(100% - 40px));
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 0 auto;
+  padding: 22px 0;
+}
+
+.driver-simple-header > a:last-child {
+  color: #176447;
+  font-weight: 850;
+}
+
+.driver-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.driver-brand > span {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 14px;
+  background: #176447;
+  color: white;
+  font-weight: 900;
+}
+
+.driver-brand strong,
+.driver-brand small {
+  display: block;
+}
+
+.driver-brand small {
+  margin-top: 4px;
+  color: #718078;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.driver-auth-layout {
+  display: grid;
+  width: min(1180px, calc(100% - 40px));
+  grid-template-columns: 0.85fr 1.15fr;
+  align-items: start;
+  gap: 60px;
+  margin: 20px auto 80px;
+  padding: 70px;
+  border-radius: 34px;
+  background: #0d3328;
+  color: white;
+}
+
+.driver-auth-copy {
+  position: sticky;
+  top: 30px;
+}
+
+.driver-auth-copy > span,
+.driver-auth-form > span,
+.driver-login-card > span,
+.driver-dashboard-header > div > span,
+.driver-section-heading > div > span,
+.driver-payout-panel > div:first-child > span {
+  color: #8fdbb3;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.driver-auth-copy h1 {
+  margin: 20px 0;
+  font-size: clamp(43px, 5vw, 66px);
+  letter-spacing: -0.055em;
+  line-height: 1;
+}
+
+.driver-auth-copy > p {
+  color: #bfd0c9;
+  line-height: 1.75;
+}
+
+.driver-benefit-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.driver-benefit-list article {
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.driver-benefit-list p {
+  margin: 6px 0 0;
+  color: #afc4bc;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.driver-auth-form,
+.driver-login-card,
+.driver-success-card {
+  display: grid;
+  gap: 17px;
+  padding: 34px;
+  border-radius: 26px;
+  background: white;
+  color: #13211c;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.18);
+}
+
+.driver-auth-form h2 {
+  margin: -6px 0 5px;
+  font-size: 31px;
+}
+
+.driver-auth-form label,
+.driver-login-card label {
+  display: grid;
+  gap: 8px;
+  color: #405149;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.driver-auth-form input,
+.driver-auth-form select,
+.driver-login-card input {
+  width: 100%;
+  height: 49px;
+  padding: 0 13px;
+  border: 1px solid rgba(18, 69, 53, 0.15);
+  border-radius: 11px;
+  background: white;
+}
+
+.driver-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 13px;
+}
+
+.driver-checkbox {
+  display: grid !important;
+  grid-template-columns: 20px 1fr;
+  align-items: start;
+}
+
+.driver-checkbox input {
+  width: 17px;
+  height: 17px;
+}
+
+.driver-primary-button {
+  min-height: 51px;
+  border: 0;
+  border-radius: 12px;
+  background: #176447;
+  color: white;
+  font-weight: 900;
+}
+
+.driver-auth-form > small,
+.driver-login-card > small {
+  color: #819089;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.driver-login-layout {
+  display: grid;
+  min-height: calc(100vh - 90px);
+  place-items: center;
+  padding: 30px 20px 80px;
+}
+
+.driver-login-card {
+  width: min(480px, 100%);
+}
+
+.driver-login-card h1 {
+  margin: 0;
+  font-size: 42px;
+}
+
+.driver-login-card > p {
+  color: #66736e;
+  line-height: 1.7;
+}
+
+.driver-login-card form {
+  display: grid;
+  gap: 17px;
+}
+
+.driver-secondary-link {
+  color: #176447;
+  text-align: center;
+  font-weight: 850;
+}
+
+.driver-form-error {
+  margin: 0;
+  color: #a4482b;
+  font-size: 12px;
+}
+
+.driver-success-card {
+  width: min(560px, calc(100% - 40px));
+  place-items: center;
+  margin: 100px auto;
+  padding: 55px;
+  text-align: center;
+}
+
+.driver-success-icon {
+  display: grid;
+  width: 76px;
+  height: 76px;
+  place-items: center;
+  border-radius: 50%;
+  background: #dff5e9;
+  color: #176447;
+  font-size: 36px;
+  font-weight: 900;
+}
+
+.driver-success-card p {
+  color: #66736e;
+  line-height: 1.7;
+}
+
+.driver-success-card button {
+  min-height: 48px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 12px;
+  background: #176447;
+  color: white;
+  font-weight: 900;
+}
+
+.driver-success-card a {
+  color: #176447;
+  font-weight: 800;
+}
+
+.driver-dashboard {
+  display: grid;
+  grid-template-columns: 255px 1fr;
+}
+
+.driver-sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  padding: 26px 20px;
+  background: #08251d;
+  color: white;
+}
+
+.driver-sidebar-brand strong {
+  color: white;
+}
+
+.driver-sidebar-brand small {
+  color: #94aea4;
+}
+
+.driver-sidebar nav {
+  display: grid;
+  gap: 8px;
+  margin-top: 45px;
+}
+
+.driver-sidebar nav button {
+  padding: 13px 15px;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  color: #afc6bd;
+  text-align: left;
+  font-weight: 750;
+}
+
+.driver-sidebar nav button:hover,
+.driver-sidebar nav .driver-nav-active {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.driver-profile-card {
+  display: grid;
+  gap: 6px;
+  margin-top: auto;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.driver-profile-card span,
+.driver-profile-card small {
+  color: #94aea4;
+  font-size: 10px;
+}
+
+.driver-main {
+  min-width: 0;
+  padding: 36px;
+}
+
+.driver-dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.driver-dashboard-header > div > span,
+.driver-section-heading > div > span,
+.driver-payout-panel > div:first-child > span {
+  color: #23845d;
+}
+
+.driver-dashboard-header h1 {
+  margin: 8px 0;
+  font-size: 37px;
+  letter-spacing: -0.045em;
+}
+
+.driver-dashboard-header p {
+  margin: 0;
+  color: #6d7b75;
+}
+
+.driver-status-button {
+  min-height: 45px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  font-weight: 900;
+}
+
+.driver-online {
+  background: #dff5e9;
+  color: #176447;
+}
+
+.driver-offline {
+  background: #e8edf0;
+  color: #56636a;
+}
+
+.driver-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.driver-metrics article,
+.driver-active-delivery,
+.driver-delivery-card,
+.driver-payout-panel {
+  border: 1px solid rgba(18, 69, 53, 0.08);
+  border-radius: 21px;
+  background: white;
+  box-shadow: 0 13px 35px rgba(8, 37, 29, 0.05);
+}
+
+.driver-metrics article {
+  display: grid;
+  gap: 10px;
+  padding: 23px;
+}
+
+.driver-metrics span {
+  color: #6b7973;
+  font-size: 12px;
+}
+
+.driver-metrics strong {
+  font-size: 28px;
+}
+
+.driver-metrics small {
+  color: #23845d;
+  font-weight: 800;
+}
+
+.driver-active-delivery,
+.driver-delivery-section,
+.driver-payout-panel {
+  margin-top: 18px;
+}
+
+.driver-active-delivery,
+.driver-payout-panel {
+  padding: 27px;
+}
+
+.driver-section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.driver-section-heading h2 {
+  margin: 6px 0 0;
+  font-size: 25px;
+}
+
+.driver-section-heading > small {
+  padding: 8px 11px;
+  border-radius: 999px;
+  background: #dff5e9;
+  color: #176447;
+  font-weight: 850;
+}
+
+.driver-section-heading > p {
+  color: #718078;
+  font-size: 12px;
+}
+
+.driver-active-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 13px;
+  margin-top: 24px;
+}
+
+.driver-active-grid article {
+  padding: 18px;
+  border-radius: 14px;
+  background: #f3f7f5;
+}
+
+.driver-active-grid span {
+  color: #718078;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.driver-active-grid strong {
+  display: block;
+  margin-top: 8px;
+}
+
+.driver-active-grid p {
+  color: #66736e;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.driver-active-actions {
+  display: flex;
+  gap: 11px;
+  margin-top: 22px;
+}
+
+.driver-active-actions a,
+.driver-active-actions button {
+  display: inline-flex;
+  min-height: 45px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 11px;
+  background: #176447;
+  color: white;
+  font-weight: 850;
+}
+
+.driver-active-actions a {
+  background: #eef7f2;
+  color: #176447;
+}
+
+.driver-delivery-section {
+  padding: 27px;
+  border-radius: 22px;
+  background: white;
+}
+
+.driver-delivery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 25px;
+}
+
+.driver-delivery-card {
+  padding: 22px;
+}
+
+.driver-delivery-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.driver-delivery-top span {
+  color: #23845d;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.driver-delivery-top h3 {
+  margin: 8px 0 0;
+}
+
+.driver-delivery-top > strong {
+  color: #176447;
+  font-size: 22px;
+}
+
+.driver-route-summary {
+  display: grid;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.driver-route-summary div {
+  display: grid;
+  gap: 5px;
+}
+
+.driver-route-summary span {
+  color: #718078;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.driver-route-summary strong {
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.driver-delivery-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 18px;
+}
+
+.driver-delivery-details span {
+  padding: 7px 9px;
+  border-radius: 999px;
+  background: #eef7f2;
+  color: #176447;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.driver-pay-breakdown {
+  display: grid;
+  gap: 9px;
+  margin-top: 20px;
+  padding-top: 17px;
+  border-top: 1px solid rgba(18, 69, 53, 0.1);
+}
+
+.driver-pay-breakdown div {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+}
+
+.driver-pay-breakdown span {
+  color: #718078;
+}
+
+.driver-delivery-card > button {
+  width: 100%;
+  min-height: 46px;
+  margin-top: 20px;
+  border: 0;
+  border-radius: 11px;
+  background: #176447;
+  color: white;
+  font-weight: 900;
+}
+
+.driver-delivery-card > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.driver-empty-state {
+  margin-top: 25px;
+  padding: 55px 20px;
+  border: 1px dashed rgba(18, 69, 53, 0.2);
+  border-radius: 18px;
+  background: #f8faf9;
+  text-align: center;
+}
+
+.driver-empty-state p {
+  color: #718078;
+}
+
+.driver-payout-panel {
+  display: grid;
+  grid-template-columns: 1fr 0.75fr;
+  align-items: center;
+  gap: 40px;
+}
+
+.driver-payout-panel h2 {
+  margin: 12px 0;
+  font-size: 31px;
+}
+
+.driver-payout-panel p {
+  color: #66736e;
+  line-height: 1.7;
+}
+
+.driver-formula {
+  display: grid;
+  gap: 10px;
+  padding: 22px;
+  border-radius: 16px;
+  background: #0d3328;
+  color: white;
+}
+
+.driver-formula span,
+.driver-formula small {
+  color: #a9c0b7;
+}
+
+@media (max-width: 1050px) {
+  .driver-auth-layout,
+  .driver-payout-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .driver-auth-copy {
+    position: static;
+  }
+
+  .driver-dashboard {
+    grid-template-columns: 85px 1fr;
+  }
+
+  .driver-sidebar-brand div,
+  .driver-sidebar nav button,
+  .driver-profile-card {
+    font-size: 0;
+  }
+
+  .driver-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .driver-delivery-grid,
+  .driver-active-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .driver-auth-layout {
+    width: min(100% - 24px, 1180px);
+    padding: 42px 20px;
+  }
+
+  .driver-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .driver-dashboard {
+    display: block;
+  }
+
+  .driver-sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
+  }
+
+  .driver-sidebar nav,
+  .driver-profile-card {
+    display: none;
+  }
+
+  .driver-main {
+    padding: 22px 14px;
+  }
+
+  .driver-dashboard-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .driver-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .driver-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .driver-active-actions {
+    flex-direction: column;
+  }
+}

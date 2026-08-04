@@ -1,0 +1,226 @@
+.community-page {
+  min-height: 100vh;
+  background: #f6f8f7;
+  color: #163128;
+}
+
+.community-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px 6%;
+  background: white;
+  border-bottom: 1px solid #e4ebe7;
+}
+
+.community-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.community-brand span:first-child {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: #16a34a;
+  color: white;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.community-brand small {
+  color: #6b7280;
+}
+
+.community-back-link {
+  color: #15803d;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.community-hero {
+  max-width: 900px;
+  margin: auto;
+  text-align: center;
+  padding: 90px 24px;
+}
+
+.community-hero span {
+  color: #16a34a;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.community-hero h1 {
+  margin: 18px 0;
+  font-size: clamp(2.5rem,5vw,4rem);
+}
+
+.community-hero p {
+  color: #5f6f68;
+  line-height: 1.8;
+  font-size: 18px;
+}
+
+.community-hero small {
+  display: block;
+  margin-top: 24px;
+  color: #6b7280;
+}
+
+.community-listings-section,
+.community-submit-section {
+  padding: 80px 6%;
+}
+
+.community-section-heading {
+  margin-bottom: 40px;
+}
+
+.community-section-heading span {
+  color: #16a34a;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  font-size: 12px;
+}
+
+.community-section-heading h2 {
+  margin-top: 10px;
+  font-size: 38px;
+}
+
+.community-listings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
+  gap: 28px;
+}
+
+.community-listings-grid article {
+  background: white;
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 12px 35px rgba(0,0,0,.08);
+}
+
+.community-listings-grid article span {
+  color: #16a34a;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.community-listings-grid h3 {
+  margin: 16px 0;
+}
+
+.community-listings-grid p {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 12px;
+  margin: 10px 0;
+}
+
+.community-listings-grid p strong {
+  color: #15803d;
+}
+
+.community-listings-grid small {
+  display: block;
+  margin-top: 18px;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.community-submit-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: start;
+}
+
+.community-submit-section span {
+  color: #16a34a;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.community-submit-section h2 {
+  margin: 14px 0;
+  font-size: 38px;
+}
+
+.community-submit-section p {
+  color: #5f6f68;
+  line-height: 1.8;
+}
+
+.community-submit-section form {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 12px 35px rgba(0,0,0,.08);
+}
+
+.community-submit-section label {
+  display: block;
+  margin-bottom: 18px;
+  font-weight: 600;
+}
+
+.community-submit-section input,
+.community-submit-section textarea {
+  width: 100%;
+  margin-top: 8px;
+  padding: 14px;
+  border: 1px solid #d6dfda;
+  border-radius: 10px;
+  font-size: 15px;
+}
+
+.community-submit-section textarea {
+  resize: vertical;
+}
+
+.community-submit-section button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 15px;
+  border: none;
+  border-radius: 10px;
+  background: #15803d;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.community-submit-section button:hover {
+  background: #166534;
+}
+
+.community-submit-section small {
+  display: block;
+  margin-top: 18px;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+  .community-submit-section {
+    grid-template-columns: 1fr;
+  }
+
+  .community-header {
+    flex-direction: column;
+    gap: 20px;
+  }
+}
