@@ -863,7 +863,7 @@ const estimatedSavings = cart.reduce((total, product) => {
               </div>
 
               <div>
-                <strong>Ahmed Hassan</strong>
+                <strong>James Wilson</strong>
                 <span>★ 4.9 · 328 deliveries</span>
               </div>
 
