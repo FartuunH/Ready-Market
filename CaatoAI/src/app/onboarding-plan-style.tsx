@@ -2,68 +2,56 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
-type FoodBudget = "budget" | "moderate" | "flexible" | "nutrition-first";
+type PlanStyle = "regular" | "intermittent-fasting" | "omad";
 
 const OPTIONS: {
-  id: FoodBudget;
+  id: PlanStyle;
   emoji: string;
   title: string;
   description: string;
+  badge?: string;
 }[] = [
   {
-    id: "budget",
-    emoji: "💵",
-    title: "Miisaaniyad yar",
+    id: "regular",
+    emoji: "🍽️",
+    title: "Qorshe caadi ah",
     description:
-      "Waxaan rabaa cuntooyin jaban oo fudud, anigoo isticmaalaya ingredients caadi ah.",
+      "Cuntooyin joogto ah, portions, protein iyo caadooyin yar-yar oo aad sii wadi karto.",
+    badge: "LAGU TALIYAY",
   },
   {
-    id: "moderate",
-    emoji: "🛒",
-    title: "Miisaaniyad dhexdhexaad ah",
+    id: "intermittent-fasting",
+    emoji: "⏰",
+    title: "Intermittent Fasting",
     description:
-      "Waxaan rabaa inaan isku daro cuntooyin jaban iyo doorashooyin kale oo kala duwan.",
+      "Waxaan rabaa inaan isticmaalo waqtiyo cunto iyo waqtiyo aanan wax cunin.",
   },
   {
-    id: "flexible",
-    emoji: "✨",
-    title: "Miisaaniyad dabacsan",
-    description:
-      "Waxaan awoodaa doorashooyin badan, waxaana jeclaan lahaa kala duwanaansho dheeraad ah.",
-  },
-  {
-    id: "nutrition-first",
-    emoji: "🌿",
-    title: "Qiimaha muhiim iima aha",
-    description:
-      "Diiradda saar nafaqada iyo waxa qorshahayga ugu fiican, halkii qiimaha laga hormarin lahaa.",
+    id: "omad",
+    emoji: "🌙",
+    title: "OMAD",
+    description: "Waxaan xiiseynayaa qaabka hal cunto oo weyn maalintii.",
   },
 ];
 
-export default function OnboardingFoodAccessScreen() {
+export default function OnboardingPlanStyleScreen() {
   const params = useLocalSearchParams();
 
   const name = typeof params.name === "string" ? params.name : "";
 
-  const city = typeof params.city === "string" ? params.city : "";
-
-  const country = typeof params.country === "string" ? params.country : "";
-
-  const [selected, setSelected] = useState<FoodBudget | null>(null);
+  const [selected, setSelected] = useState<PlanStyle>("regular");
 
   const selectedOption = OPTIONS.find((option) => option.id === selected);
 
-  const canContinue = selected !== null;
-
   const continueNext = () => {
-    if (!selected || !selectedOption) return;
+    if (!selectedOption) return;
 
     router.push({
-      pathname: "/onboarding-plan-style",
+      pathname: "/onboarding-building-plan",
       params: {
         ...params,
-        foodBudget: selected,
-        foodBudgetLabel: selectedOption.title,
+        planStyle: selected,
+        planStyleLabel: selectedOption.title,
       },
     });
   };
@@ -93,9 +81,7 @@ export default function OnboardingFoodAccessScreen() {
               <View style={styles.progressFill} />
             </View>
 
-            <Text style={styles.progressText}>
-              Qorshahaaga ayaa ku dhow inuu diyaar noqdo
-            </Text>
+            <Text style={styles.progressText}>Tallaabadii ugu dambeysay</Text>
           </View>
         </View>
 
@@ -108,9 +94,8 @@ export default function OnboardingFoodAccessScreen() {
 
           <View style={styles.coachTextArea}>
             <Text style={styles.coachName}>CaatoAI</Text>
-
             <Text style={styles.coachLabel}>
-              Aan qorshahaaga ka dhigno mid noloshaada ku shaqeeya
+              Aan dooranno qaabka aad ku bilaabayso
             </Text>
           </View>
         </View>
@@ -122,9 +107,9 @@ export default function OnboardingFoodAccessScreen() {
             <Text style={styles.personalEmoji}>💚</Text>
 
             <Text style={styles.personalText}>
-              {name}, qorshe fiican ma aha mid caafimaad leh oo keliya — waa
-              inuu sidoo kale noqdaa mid aad si dhab ah u iibsan karto oo aad
-              sii wadi karto.
+              {name}, ma jiro hal qaab oo qof walba u shaqeeya. Waxaad dooran
+              kartaa sida aad rabto inaad ku bilowdo, waadna beddeli kartaa mar
+              dambe.
             </Text>
           </View>
         ) : null}
@@ -133,40 +118,20 @@ export default function OnboardingFoodAccessScreen() {
 
         <View style={styles.hero}>
           <View style={styles.stepBadge}>
-            <Text style={styles.stepBadgeText}>MIISAANIYADDA CUNTADA</Text>
+            <Text style={styles.stepBadgeText}>QAABKA QORSHAHAAGA</Text>
           </View>
 
           <Text style={styles.title}>
-            Sidee ayaad rabtaa inaan{"\n"}
-            <Text style={styles.titleGreen}>qiimaha cuntada u tixgelinno?</Text>
+            Sidee ayaad rabtaa inaad{"\n"}
+            <Text style={styles.titleGreen}>ku bilowdo?</Text>
           </Text>
 
           <Text style={styles.subtitle}>
-            Dooro midka sida ugu dhow kuu metelaya. CaatoAI wuxuu tan u
-            isticmaali doonaa inuu kuu soo jeediyo cuntooyin ku habboon
-            noloshaada.
+            CaatoAI wuxuu diiradda saarayaa caadooyin waara. Haddii aad doorato
+            fasting, waxaan weli ilaalin doonaa nafaqada, protein-ka iyo tayada
+            cuntada.
           </Text>
-
-          <View style={styles.oneBadge}>
-            <Text style={styles.oneBadgeText}>✓ Dooro hal mid</Text>
-          </View>
         </View>
-
-        {/* LOCATION CONTEXT */}
-
-        {(city || country) && (
-          <View style={styles.locationStrip}>
-            <Text style={styles.locationEmoji}>📍</Text>
-
-            <View style={styles.locationTextArea}>
-              <Text style={styles.locationLabel}>DEEGAANKAAGA</Text>
-
-              <Text style={styles.locationText}>
-                {[city, country].filter(Boolean).join(", ")}
-              </Text>
-            </View>
-          </View>
-        )}
 
         {/* OPTIONS */}
 
@@ -194,14 +159,24 @@ export default function OnboardingFoodAccessScreen() {
                 </View>
 
                 <View style={styles.optionTextArea}>
-                  <Text
-                    style={[
-                      styles.optionTitle,
-                      isSelected && styles.optionTitleSelected,
-                    ]}
-                  >
-                    {option.title}
-                  </Text>
+                  <View style={styles.optionTitleRow}>
+                    <Text
+                      style={[
+                        styles.optionTitle,
+                        isSelected && styles.optionTitleSelected,
+                      ]}
+                    >
+                      {option.title}
+                    </Text>
+
+                    {option.badge ? (
+                      <View style={styles.recommendedBadge}>
+                        <Text style={styles.recommendedText}>
+                          {option.badge}
+                        </Text>
+                      </View>
+                    ) : null}
+                  </View>
 
                   <Text style={styles.optionDescription}>
                     {option.description}
@@ -221,108 +196,102 @@ export default function OnboardingFoodAccessScreen() {
           })}
         </View>
 
-        {/* DYNAMIC RESPONSE */}
+        {/* DYNAMIC PLAN EXPLANATION */}
 
-        {selected && (
-          <View style={styles.aiCard}>
+        <View style={styles.aiCard}>
+          <View style={styles.aiTop}>
             <View style={styles.aiIcon}>
               <Text style={styles.aiEmoji}>✨</Text>
             </View>
 
-            <View style={styles.aiTextArea}>
-              <Text style={styles.aiLabel}>CAATOAI</Text>
+            <View style={styles.aiHeading}>
+              <Text style={styles.aiLabel}>QORSHAHA CAATOAI</Text>
 
-              {selected === "budget" && (
-                <>
-                  <Text style={styles.aiTitle}>
-                    Cunto caafimaad leh khasab ma aha inay qaali noqoto
-                  </Text>
-
-                  <Text style={styles.aiText}>
-                    Waxaan mudnaanta siin doonaa ingredients fudud sida ukunta,
-                    digirta, bariiska, oats-ka, khudaarta iyo protein-ka
-                    qiimihiisu macquulka yahay.
-                  </Text>
-                </>
-              )}
-
-              {selected === "moderate" && (
-                <>
-                  <Text style={styles.aiTitle}>
-                    Waxaan isku dheelitiri doonaa qiimaha iyo kala duwanaanshaha
-                  </Text>
-
-                  <Text style={styles.aiText}>
-                    Qorshahaagu wuxuu yeelan karaa cuntooyin maalinle ah oo
-                    jaban iyo doorashooyin kale oo kuu siinaya kala duwanaansho.
-                  </Text>
-                </>
-              )}
-
-              {selected === "flexible" && (
-                <>
-                  <Text style={styles.aiTitle}>
-                    Waxaan kuu furi karnaa doorashooyin badan
-                  </Text>
-
-                  <Text style={styles.aiText}>
-                    CaatoAI wuxuu isticmaali karaa ingredients kala duwan isagoo
-                    weli ilaalinaya hadafkaaga iyo cuntooyinka aad jeceshahay.
-                  </Text>
-                </>
-              )}
-
-              {selected === "nutrition-first" && (
-                <>
-                  <Text style={styles.aiTitle}>
-                    Nafaqada ayaan mudnaanta siin doonaa
-                  </Text>
-
-                  <Text style={styles.aiText}>
-                    Waxaan marka hore eegi doonaa protein-ka, fiber-ka,
-                    portions-ka iyo kala duwanaanshaha cuntada, annagoo qiimaha
-                    siinayna mudnaan yar.
-                  </Text>
-                </>
-              )}
+              <Text style={styles.aiTitle}>
+                {selected === "regular"
+                  ? "Bilow fudud oo la sii wadi karo"
+                  : selected === "intermittent-fasting"
+                    ? "Fasting-ku waa qaabka waqtiga cuntada"
+                    : "OMAD wuxuu u baahan yahay qorshe taxaddar leh"}
+              </Text>
             </View>
           </View>
-        )}
 
-        {/* REAL LIFE */}
+          {selected === "regular" && (
+            <Text style={styles.aiText}>
+              Waxaan kuu dhisi doonaa cuntooyin joogto ah oo diiradda saaraya
+              portions, protein, khudaar, biyo iyo caadooyin aad maalin kasta ku
+              horumarin karto.
+            </Text>
+          )}
 
-        <View style={styles.infoCard}>
-          <View style={styles.infoIcon}>
-            <Text style={styles.infoEmoji}>🛒</Text>
+          {selected === "intermittent-fasting" && (
+            <Text style={styles.aiText}>
+              Haddii fasting-ku kuu habboon yahay, CaatoAI wuxuu kaa caawin
+              karaa inaad doorato eating window macquul ah. Fasting-ku ma
+              beddelayo muhiimadda nafaqada iyo qadarka cuntada.
+            </Text>
+          )}
+
+          {selected === "omad" && (
+            <Text style={styles.aiText}>
+              OMAD waa qaab ka xaddidan qorshaha caadiga ah. CaatoAI wuxuu marka
+              hore tixgelin doonaa xogtaada iyo xaaladaha kaa dhigaya fasting
+              mid aan kugu habboonayn ka hor inta aan loo isticmaalin qorshe
+              maalinle ah.
+            </Text>
+          )}
+        </View>
+
+        {/* NO BAD FOODS */}
+
+        <View style={styles.philosophyCard}>
+          <View style={styles.philosophyIcon}>
+            <Text style={styles.philosophyEmoji}>🍲</Text>
           </View>
 
-          <View style={styles.infoTextArea}>
-            <Text style={styles.infoTitle}>
-              Qorshe loogu talagalay nolosha dhabta ah
+          <View style={styles.philosophyTextArea}>
+            <Text style={styles.philosophyTitle}>
+              Cuntada aad jeceshahay weli meel ayay leedahay
             </Text>
 
-            <Text style={styles.infoText}>
-              Uma baahnid cuntooyin “diet” gaar ah. Waxaan rabnaa inaan ka
-              shaqayno cuntooyinka iyo ingredients-ka aad caadi ahaan heli
-              karto.
+            <Text style={styles.philosophyText}>
+              Qaabka aad doorato ma micnaheedu aha inaad ka tagto cuntadaada
+              caadiga ah. Waxaan baran doonaa portions, isku dheelitirka iyo
+              sida cuntadu ugu habboonaan karto hadafkaaga.
             </Text>
           </View>
         </View>
 
-        {/* AFFORDABILITY */}
+        {/* SAFETY */}
 
-        <View style={styles.tipCard}>
-          <Text style={styles.tipEmoji}>🌱</Text>
+        <View style={styles.safetyCard}>
+          <Text style={styles.safetyEmoji}>🛡️</Text>
 
-          <View style={styles.tipTextArea}>
-            <Text style={styles.tipTitle}>
-              Qiimo jaban macnaheedu ma aha nafaqo yar
+          <View style={styles.safetyTextArea}>
+            <Text style={styles.safetyTitle}>
+              Fasting qof walba kuma habboona
             </Text>
 
-            <Text style={styles.tipText}>
-              Digir, ukun, oats, bariis, tuna, frozen vegetables iyo cuntooyin
-              kale oo fudud ayaa noqon kara qayb ka mid ah qorshe caafimaad leh
-              iyadoo ku xiran baahidaada.
+            <Text style={styles.safetyText}>
+              Uurka, naasnuujinta, xaalado caafimaad qaarkood, daawooyinka
+              qaarkood ama taariikh dhibaatooyin cunto waxay beddeli karaan waxa
+              kugu habboon. CaatoAI ma beddelayo talada dhakhtarkaaga.
+            </Text>
+          </View>
+        </View>
+
+        {/* CHANGE LATER */}
+
+        <View style={styles.changeCard}>
+          <Text style={styles.changeEmoji}>🔄</Text>
+
+          <View style={styles.changeTextArea}>
+            <Text style={styles.changeTitle}>Go'aankani joogto ma aha</Text>
+
+            <Text style={styles.changeText}>
+              Waxaad qaabkaaga mar dambe beddeli kartaa. Hadafku waa inaan helno
+              waxa aad si caafimaad leh u sii wadi karto.
             </Text>
           </View>
         </View>
@@ -331,21 +300,20 @@ export default function OnboardingFoodAccessScreen() {
 
         <View style={styles.bottomArea}>
           <Pressable
-            disabled={!canContinue}
             onPress={continueNext}
             style={({ pressed }) => [
               styles.button,
-              !canContinue && styles.buttonDisabled,
-              pressed && canContinue && styles.buttonPressed,
+              pressed && styles.buttonPressed,
             ]}
           >
-            <Text style={styles.buttonText}>Sii wad</Text>
+            <Text style={styles.buttonText}>Samee qorshahayga</Text>
+
             <Text style={styles.buttonArrow}>→</Text>
           </Pressable>
 
           <Text style={styles.bottomText}>
-            💚 Waxaad miisaaniyadda cuntada mar dambe ka beddeli kartaa
-            qorshahaaga.
+            🌿 CaatoAI wuxuu hadda isku dari doonaa jawaabahaaga si uu kuu tuso
+            qorshahaaga bilowga ah.
           </Text>
         </View>
       </View>
@@ -414,7 +382,7 @@ const styles = StyleSheet.create({
   },
 
   progressFill: {
-    width: "95%",
+    width: "100%",
     height: "100%",
     backgroundColor: "#4F7C5B",
     borderRadius: 999,
@@ -488,7 +456,7 @@ const styles = StyleSheet.create({
   },
 
   hero: {
-    marginBottom: 17,
+    marginBottom: 18,
   },
 
   stepBadge: {
@@ -526,53 +494,6 @@ const styles = StyleSheet.create({
     lineHeight: 21,
   },
 
-  oneBadge: {
-    alignSelf: "flex-start",
-    backgroundColor: "#F0F4ED",
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    marginTop: 11,
-  },
-
-  oneBadgeText: {
-    color: "#657069",
-    fontSize: 9,
-    fontWeight: "800",
-  },
-
-  locationStrip: {
-    backgroundColor: "#F3F1EA",
-    borderRadius: 16,
-    padding: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-
-  locationEmoji: {
-    fontSize: 18,
-    marginRight: 10,
-  },
-
-  locationTextArea: {
-    flex: 1,
-  },
-
-  locationLabel: {
-    color: "#849087",
-    fontSize: 8,
-    fontWeight: "900",
-    letterSpacing: 0.8,
-  },
-
-  locationText: {
-    color: "#405347",
-    fontSize: 11,
-    fontWeight: "800",
-    marginTop: 2,
-  },
-
   optionsArea: {
     gap: 10,
   },
@@ -581,8 +502,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderWidth: 1.5,
     borderColor: "#E0E6E0",
-    borderRadius: 19,
-    padding: 14,
+    borderRadius: 20,
+    padding: 15,
     flexDirection: "row",
     alignItems: "center",
   },
@@ -597,9 +518,9 @@ const styles = StyleSheet.create({
   },
 
   optionIcon: {
-    width: 45,
-    height: 45,
-    borderRadius: 14,
+    width: 47,
+    height: 47,
+    borderRadius: 15,
     backgroundColor: "#F2F5F1",
     alignItems: "center",
     justifyContent: "center",
@@ -611,7 +532,7 @@ const styles = StyleSheet.create({
   },
 
   optionEmoji: {
-    fontSize: 20,
+    fontSize: 21,
   },
 
   optionTextArea: {
@@ -619,11 +540,18 @@ const styles = StyleSheet.create({
     paddingRight: 8,
   },
 
+  optionTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 6,
+    marginBottom: 4,
+  },
+
   optionTitle: {
     color: "#303A33",
     fontSize: 13,
     fontWeight: "900",
-    marginBottom: 3,
   },
 
   optionTitleSelected: {
@@ -634,6 +562,20 @@ const styles = StyleSheet.create({
     color: "#818A83",
     fontSize: 10,
     lineHeight: 15,
+  },
+
+  recommendedBadge: {
+    backgroundColor: "#DDEDDD",
+    borderRadius: 999,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+  },
+
+  recommendedText: {
+    color: "#376647",
+    fontSize: 7,
+    fontWeight: "900",
+    letterSpacing: 0.5,
   },
 
   radioOuter: {
@@ -661,26 +603,30 @@ const styles = StyleSheet.create({
     marginTop: 13,
     backgroundColor: "#173F2A",
     borderRadius: 21,
-    padding: 15,
+    padding: 16,
+  },
+
+  aiTop: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
+    marginBottom: 10,
   },
 
   aiIcon: {
-    width: 41,
-    height: 41,
+    width: 40,
+    height: 40,
     borderRadius: 13,
     backgroundColor: "#28563A",
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 11,
+    marginRight: 10,
   },
 
   aiEmoji: {
     fontSize: 18,
   },
 
-  aiTextArea: {
+  aiHeading: {
     flex: 1,
   },
 
@@ -689,14 +635,13 @@ const styles = StyleSheet.create({
     fontSize: 8,
     fontWeight: "900",
     letterSpacing: 0.9,
-    marginBottom: 3,
+    marginBottom: 2,
   },
 
   aiTitle: {
     color: "#FFFFFF",
     fontSize: 12,
     fontWeight: "900",
-    marginBottom: 4,
   },
 
   aiText: {
@@ -705,7 +650,7 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
 
-  infoCard: {
+  philosophyCard: {
     marginTop: 11,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
@@ -716,7 +661,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
 
-  infoIcon: {
+  philosophyIcon: {
     width: 39,
     height: 39,
     borderRadius: 12,
@@ -726,28 +671,61 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
 
-  infoEmoji: {
+  philosophyEmoji: {
     fontSize: 17,
   },
 
-  infoTextArea: {
+  philosophyTextArea: {
     flex: 1,
   },
 
-  infoTitle: {
+  philosophyTitle: {
     color: "#35473A",
     fontSize: 11,
     fontWeight: "900",
     marginBottom: 3,
   },
 
-  infoText: {
+  philosophyText: {
     color: "#7B847D",
     fontSize: 10,
     lineHeight: 15,
   },
 
-  tipCard: {
+  safetyCard: {
+    marginTop: 11,
+    backgroundColor: "#FFF8E8",
+    borderWidth: 1,
+    borderColor: "#F2E4BE",
+    borderRadius: 18,
+    padding: 14,
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+
+  safetyEmoji: {
+    fontSize: 17,
+    marginRight: 10,
+  },
+
+  safetyTextArea: {
+    flex: 1,
+  },
+
+  safetyTitle: {
+    color: "#67582E",
+    fontSize: 11,
+    fontWeight: "900",
+    marginBottom: 3,
+  },
+
+  safetyText: {
+    color: "#7D7355",
+    fontSize: 10,
+    lineHeight: 15,
+  },
+
+  changeCard: {
     marginTop: 11,
     backgroundColor: "#EAF4EA",
     borderRadius: 18,
@@ -756,23 +734,23 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
 
-  tipEmoji: {
+  changeEmoji: {
     fontSize: 17,
     marginRight: 10,
   },
 
-  tipTextArea: {
+  changeTextArea: {
     flex: 1,
   },
 
-  tipTitle: {
+  changeTitle: {
     color: "#28563A",
     fontSize: 11,
     fontWeight: "900",
     marginBottom: 3,
   },
 
-  tipText: {
+  changeText: {
     color: "#607067",
     fontSize: 10,
     lineHeight: 15,
@@ -792,10 +770,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 20,
-  },
-
-  buttonDisabled: {
-    backgroundColor: "#C9D5CB",
   },
 
   buttonPressed: {

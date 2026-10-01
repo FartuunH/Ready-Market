@@ -13,7 +13,13 @@ export default function RootLayout() {
         },
         headerLeft: () => (
           <Pressable
-            onPress={() => router.back()}
+            onPress={() => {
+              if (router.canGoBack()) {
+                router.back();
+              } else {
+                router.replace("/");
+              }
+            }}
             style={styles.backButton}
             hitSlop={10}
           >
@@ -41,31 +47,41 @@ export default function RootLayout() {
       <Stack.Screen name="onboarding-goal-weight" />
       <Stack.Screen name="onboarding-movement" />
       <Stack.Screen name="onboarding-exercise" />
+
+      {/* Eating habits */}
+      <Stack.Screen name="onboarding-eating-style" />
       <Stack.Screen name="onboarding-eating-behavior" />
       <Stack.Screen name="onboarding-food-culture" />
+
+      {/* Personalization */}
       <Stack.Screen name="onboarding-womens-health" />
-      <Stack.Screen name="onboarding-eating-style" />
       <Stack.Screen name="onboarding-food-access" />
+
+      {/* Final plan setup */}
+      <Stack.Screen name="onboarding-plan-style" />
+      <Stack.Screen name="onboarding-plan-preview" />
+
+      {/* Older screens we are keeping for now */}
       <Stack.Screen name="onboarding-summary" />
+
       <Stack.Screen
         name="onboarding-building-plan"
         options={{ headerShown: false }}
       />
 
-      {/* Plan */}
-      <Stack.Screen name="plan-ready" />
-
-      {/* Main app */}
+      <Stack.Screen name="meal-plan" />
       <Stack.Screen
-        name="dashboard"
+        name="weekly-meal-plan"
         options={{
           headerShown: false,
         }}
       />
+      <Stack.Screen name="weight-progress" options={{ headerShown: false }} />
 
-      <Stack.Screen name="meal-plan" />
+      <Stack.Screen name="daily-lesson" options={{ headerShown: false }} />
+
       <Stack.Screen name="ai-coach" />
-      <Stack.Screen name="weight-progress" />
+
       <Stack.Screen name="reminders" />
     </Stack>
   );

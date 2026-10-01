@@ -1,98 +1,142 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
-type Motivation =
-  | "weight-loss"
-  | "health"
-  | "energy"
-  | "confidence"
-  | "family"
-  | "other";
-
-const motivations: {
-  id: Motivation;
-  emoji: string;
-  title: string;
-  description: string;
-}[] = [
-  {
-    id: "weight-loss",
-    emoji: "⚖️",
-    title: "Waxaan rabaa inaan miisaan dhimo",
-    description: "Waxaan rabaa inaan gaaro miisaan ii caafimaad badan.",
-  },
-  {
-    id: "health",
-    emoji: "💚",
-    title: "Waxaan rabaa caafimaad wanaagsan",
-    description: "Waxaan rabaa inaan dhiso caadooyin caafimaad leh.",
-  },
-  {
-    id: "energy",
-    emoji: "⚡",
-    title: "Waxaan rabaa tamar badan",
-    description: "Waxaan rabaa inaan maalintii dareemo firfircooni badan.",
-  },
-  {
-    id: "confidence",
-    emoji: "✨",
-    title: "Waxaan rabaa inaan naftayda ku fiicnaado",
-    description:
-      "Waxaan rabaa inaan naftayda iyo jirkeyga si fiican u daryeelo.",
-  },
-  {
-    id: "family",
-    emoji: "👨‍👩‍👧",
-    title: "Waxaan rabaa inaan caafimaad u ahaado qoyskayga",
-    description:
-      "Waxaan rabaa caafimaad aan kula raaxaysto dadka aan jeclahay.",
-  },
-  {
-    id: "other",
-    emoji: "🌿",
-    title: "Sabab kale",
-    description: "Waxaan leeyahay sabab kale oo aniga ii gaar ah.",
-  },
-];
+type HeightUnit = "imperial" | "metric";
+type WeightUnit = "lbs" | "kg";
 
 export default function OnboardingBodyScreen() {
-  const { name, age } = useLocalSearchParams<{
+  const params = useLocalSearchParams<{
     name?: string;
+    motivation?: string;
+    barriers?: string;
     age?: string;
   }>();
 
-  const [motivation, setMotivation] = useState<Motivation | null>(null);
+  const [heightUnit, setHeightUnit] = useState<HeightUnit>("imperial");
 
-  const selectedMotivation = motivations.find((item) => item.id === motivation);
+  const [weightUnit, setWeightUnit] = useState<WeightUnit>("lbs");
+
+  const [feet, setFeet] = useState("");
+  const [inches, setInches] = useState("");
+  const [centimeters, setCentimeters] = useState("");
+  const [weight, setWeight] = useState("");
+
+  const cleanNumber = (value: string, maxLength = 3) =>
+    value.replace(/[^0-9]/g, "").slice(0, maxLength);
+
+  const feetNumber = Number(feet);
+  const inchesNumber = Number(inches);
+  const cmNumber = Number(centimeters);
+  const weightNumber = Number(weight);
+
+  const validImperialHeight =
+    feet.length > 0 &&
+    feetNumber >= 3 &&
+    feetNumber <= 8 &&
+    inches.length > 0 &&
+    inchesNumber >= 0 &&
+    inchesNumber <= 11;
+
+  const validMetricHeight =
+    centimeters.length > 0 && cmNumber >= 90 && cmNumber <= 250;
+
+  const validHeight =
+    heightUnit === "imperial" ? validImperialHeight : validMetricHeight;
+
+  const validWeight =
+    weight.length > 0 &&
+    (weightUnit === "lbs"
+      ? weightNumber >= 60 && weightNumber <= 700
+      : weightNumber >= 27 && weightNumber <= 320);
+
+  const canContinue = validHeight && validWeight;
 
   const continueNext = () => {
-    if (!motivation) return;
+    if (!canContinue) return;
+
+    Keyboard.dismiss();
+
+    let heightCm = cmNumber;
+
+    if (heightUnit === "imperial") {
+      heightCm = Math.round(feetNumber * 30.48 + inchesNumber * 2.54);
+    }
+
+    const weightKg =
+      weightUnit === "lbs"
+        ? Math.round(weightNumber * 0.453592 * 10) / 10
+        : weightNumber;
 
     router.push({
-      pathname: "/onboarding-activity",
+      pathname: "/onboarding-goal-weight",
       params: {
-        name,
-        age,
-        motivation,
-        motivationLabel: selectedMotivation?.title ?? "",
+        ...params,
+
+        heightUnit,
+        weightUnit,
+
+        feet: heightUnit === "imperial" ? feet : "",
+        inches: heightUnit === "imperial" ? inches : "",
+        centimeters: heightUnit === "metric" ? centimeters : "",
+
+        currentWeight: weight,
+
+        // Standardized values for later calculations
+        heightCm: String(heightCm),
+        currentWeightKg: String(weightKg),
       },
     });
   };
 
   return (
-    <View style={styles.screen}>
+    <KeyboardAvoidingView
+      style={styles.screen}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
       <ScrollView
         contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.content}>
-          {/* Progress */}
-          <View style={styles.progressTrack}>
-            <View style={styles.progressFill} />
+        <View style={styles.container}>
+          {/* TOP */}
+
+          <View style={styles.topRow}>
+            <Pressable
+              onPress={() => router.back()}
+              style={({ pressed }) => [
+                styles.backButton,
+                pressed && styles.pressed,
+              ]}
+            >
+              <Text style={styles.backArrow}>‹</Text>
+            </Pressable>
+
+            <View style={styles.progressArea}>
+              <View style={styles.progressTrack}>
+                <View style={styles.progressFill} />
+              </View>
+
+              <Text style={styles.progressText}>
+                Waxaan kuu dhisaynaa qorshe kuu gaar ah
+              </Text>
+            </View>
           </View>
 
-          {/* Coach */}
+          {/* COACH */}
+
           <View style={styles.coachRow}>
             <View style={styles.coachIcon}>
               <Text style={styles.coachEmoji}>🌿</Text>
@@ -100,320 +144,549 @@ export default function OnboardingBodyScreen() {
 
             <View>
               <Text style={styles.coachName}>CaatoAI</Text>
-              <Text style={styles.coachLabel}>Aan fahanno sababtaada</Text>
+
+              <Text style={styles.coachLabel}>Aan fahanno jirkaaga</Text>
             </View>
           </View>
 
-          {/* Question */}
-          <View style={styles.questionArea}>
-            <Text style={styles.smallGreeting}>
-              {name ? `${name}, ` : ""}
-              su’aal muhiim ah 💚
-            </Text>
+          {/* HERO */}
+
+          <View style={styles.hero}>
+            <View style={styles.stepBadge}>
+              <Text style={styles.stepBadgeText}>JIRKAAGA</Text>
+            </View>
 
             <Text style={styles.title}>
-              Maxaa maanta kuu{"\n"}
-              <Text style={styles.titleHighlight}>keenay CaatoAI?</Text>
+              Aan wax yar ka{"\n"}
+              <Text style={styles.titleGreen}>baranno jirkaaga.</Text>
             </Text>
 
             <Text style={styles.subtitle}>
-              Sababta aad u bilowday waxay naga caawinaysaa inaan qorshahaaga ku
-              dhisno waxyaabaha adiga muhiimka kuu ah.
+              Dhererkaaga iyo miisaankaaga hadda waxay CaatoAI ka caawinayaan
+              inuu kuu diyaariyo qorshe bilow ah oo adiga kugu habboon.
             </Text>
           </View>
 
-          {/* Options */}
-          <View style={styles.optionsArea}>
-            {motivations.map((item) => {
-              const selected = motivation === item.id;
+          {/* HEIGHT */}
 
-              return (
-                <Pressable
-                  key={item.id}
-                  onPress={() => setMotivation(item.id)}
-                  style={({ pressed }) => [
-                    styles.option,
-                    selected && styles.optionSelected,
-                    pressed && styles.optionPressed,
+          <View style={styles.sectionCard}>
+            <View style={styles.sectionHeader}>
+              <View>
+                <Text style={styles.sectionLabel}>DHERERKAAGA</Text>
+
+                <Text style={styles.sectionHint}>Geli dhererkaaga hadda</Text>
+              </View>
+
+              <View style={styles.sectionIcon}>
+                <Text style={styles.sectionEmoji}>📏</Text>
+              </View>
+            </View>
+
+            {/* HEIGHT UNIT */}
+
+            <View style={styles.segment}>
+              <Pressable
+                onPress={() => setHeightUnit("imperial")}
+                style={[
+                  styles.segmentButton,
+                  heightUnit === "imperial" && styles.segmentButtonActive,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.segmentText,
+                    heightUnit === "imperial" && styles.segmentTextActive,
                   ]}
                 >
-                  <View
-                    style={[
-                      styles.optionIcon,
-                      selected && styles.optionIconSelected,
-                    ]}
-                  >
-                    <Text style={styles.optionEmoji}>{item.emoji}</Text>
-                  </View>
+                  ft / in
+                </Text>
+              </Pressable>
 
-                  <View style={styles.optionTextArea}>
-                    <Text
-                      style={[
-                        styles.optionTitle,
-                        selected && styles.optionTitleSelected,
-                      ]}
-                    >
-                      {item.title}
-                    </Text>
+              <Pressable
+                onPress={() => setHeightUnit("metric")}
+                style={[
+                  styles.segmentButton,
+                  heightUnit === "metric" && styles.segmentButtonActive,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.segmentText,
+                    heightUnit === "metric" && styles.segmentTextActive,
+                  ]}
+                >
+                  cm
+                </Text>
+              </Pressable>
+            </View>
 
-                    <Text style={styles.optionDescription}>
-                      {item.description}
-                    </Text>
-                  </View>
+            {heightUnit === "imperial" ? (
+              <View style={styles.measurementRow}>
+                <View style={styles.measurementField}>
+                  <TextInput
+                    value={feet}
+                    onChangeText={(value) => setFeet(cleanNumber(value, 1))}
+                    placeholder="5"
+                    placeholderTextColor="#B1B8B2"
+                    keyboardType="number-pad"
+                    style={styles.input}
+                  />
 
-                  <View
-                    style={[
-                      styles.checkCircle,
-                      selected && styles.checkCircleSelected,
-                    ]}
-                  >
-                    {selected && <Text style={styles.checkText}>✓</Text>}
-                  </View>
-                </Pressable>
-              );
-            })}
+                  <Text style={styles.unitLabel}>ft</Text>
+                </View>
+
+                <View style={styles.measurementField}>
+                  <TextInput
+                    value={inches}
+                    onChangeText={(value) => setInches(cleanNumber(value, 2))}
+                    placeholder="4"
+                    placeholderTextColor="#B1B8B2"
+                    keyboardType="number-pad"
+                    style={styles.input}
+                  />
+
+                  <Text style={styles.unitLabel}>in</Text>
+                </View>
+              </View>
+            ) : (
+              <View style={styles.singleMeasurement}>
+                <TextInput
+                  value={centimeters}
+                  onChangeText={(value) =>
+                    setCentimeters(cleanNumber(value, 3))
+                  }
+                  placeholder="163"
+                  placeholderTextColor="#B1B8B2"
+                  keyboardType="number-pad"
+                  style={styles.input}
+                />
+
+                <Text style={styles.unitLabel}>cm</Text>
+              </View>
+            )}
+
+            {heightUnit === "imperial" &&
+              feet.length > 0 &&
+              inches.length > 0 &&
+              !validImperialHeight && (
+                <Text style={styles.errorText}>Fadlan geli dherer sax ah.</Text>
+              )}
+
+            {heightUnit === "metric" &&
+              centimeters.length > 0 &&
+              !validMetricHeight && (
+                <Text style={styles.errorText}>Fadlan geli dherer sax ah.</Text>
+              )}
           </View>
 
-          {/* Personalized response */}
-          {selectedMotivation && (
+          {/* WEIGHT */}
+
+          <View style={styles.sectionCard}>
+            <View style={styles.sectionHeader}>
+              <View>
+                <Text style={styles.sectionLabel}>MIISAANKAAGA HADDA</Text>
+
+                <Text style={styles.sectionHint}>Geli miisaankaaga hadda</Text>
+              </View>
+
+              <View style={styles.sectionIcon}>
+                <Text style={styles.sectionEmoji}>⚖️</Text>
+              </View>
+            </View>
+
+            <View style={styles.segment}>
+              <Pressable
+                onPress={() => setWeightUnit("lbs")}
+                style={[
+                  styles.segmentButton,
+                  weightUnit === "lbs" && styles.segmentButtonActive,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.segmentText,
+                    weightUnit === "lbs" && styles.segmentTextActive,
+                  ]}
+                >
+                  lbs
+                </Text>
+              </Pressable>
+
+              <Pressable
+                onPress={() => setWeightUnit("kg")}
+                style={[
+                  styles.segmentButton,
+                  weightUnit === "kg" && styles.segmentButtonActive,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.segmentText,
+                    weightUnit === "kg" && styles.segmentTextActive,
+                  ]}
+                >
+                  kg
+                </Text>
+              </Pressable>
+            </View>
+
+            <View style={styles.singleMeasurement}>
+              <TextInput
+                value={weight}
+                onChangeText={(value) => setWeight(cleanNumber(value, 3))}
+                placeholder={weightUnit === "lbs" ? "180" : "82"}
+                placeholderTextColor="#B1B8B2"
+                keyboardType="number-pad"
+                returnKeyType="done"
+                onSubmitEditing={continueNext}
+                style={styles.input}
+              />
+
+              <Text style={styles.unitLabel}>{weightUnit}</Text>
+            </View>
+
+            {weight.length > 0 && !validWeight && (
+              <Text style={styles.errorText}>Fadlan geli miisaan sax ah.</Text>
+            )}
+          </View>
+
+          {/* COACH MESSAGE */}
+
+          {canContinue && (
             <View style={styles.responseCard}>
               <Text style={styles.responseEmoji}>💚</Text>
 
               <View style={styles.responseTextArea}>
-                <Text style={styles.responseTitle}>
-                  Sababtaada waan xasuusan doonaa.
-                </Text>
+                <Text style={styles.responseTitle}>Waan helnay.</Text>
 
                 <Text style={styles.responseText}>
-                  Marka safarku adkaado, CaatoAI wuxuu kaa caawin doonaa inaad
-                  dib ugu soo noqoto sababta aad maanta u bilowday.
+                  Tallaabada xigta waxaan ku weydiin doonaa miisaanka aad rabto
+                  inaad gaarto.
                 </Text>
               </View>
             </View>
           )}
 
-          {/* Continue */}
-          <Pressable
-            disabled={!motivation}
-            onPress={continueNext}
-            style={({ pressed }) => [
-              styles.button,
-              !motivation && styles.buttonDisabled,
-              pressed && motivation && styles.buttonPressed,
-            ]}
-          >
-            <Text style={styles.buttonText}>Sii wad</Text>
-            <Text style={styles.buttonArrow}>→</Text>
-          </Pressable>
+          {/* PRIVACY CARD */}
+
+          <View style={styles.infoCard}>
+            <View style={styles.infoIcon}>
+              <Text style={styles.infoEmoji}>🔒</Text>
+            </View>
+
+            <View style={styles.infoTextArea}>
+              <Text style={styles.infoTitle}>Xogtaada waa kuu gaar</Text>
+
+              <Text style={styles.infoText}>
+                Dhererkaaga iyo miisaankaaga waxaa loo isticmaalaa shakhsiyeynta
+                qorshahaaga CaatoAI.
+              </Text>
+            </View>
+          </View>
+
+          {/* BUTTON */}
+
+          <View style={styles.bottomArea}>
+            <Pressable
+              disabled={!canContinue}
+              onPress={continueNext}
+              style={({ pressed }) => [
+                styles.button,
+                !canContinue && styles.buttonDisabled,
+                pressed && canContinue && styles.buttonPressed,
+              ]}
+            >
+              <Text style={styles.buttonText}>Sii wad</Text>
+
+              <Text style={styles.buttonArrow}>→</Text>
+            </Pressable>
+
+            <Text style={styles.bottomText}>
+              🌿 Uma baahnid inaad noqoto perfect — waxaan rabnaa oo keliya
+              inaan fahanno halka aad maanta joogto.
+            </Text>
+          </View>
         </View>
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#FFFBF5",
+    backgroundColor: "#FBF8F1",
   },
 
   scrollContent: {
     flexGrow: 1,
-    paddingVertical: 20,
+    paddingVertical: 18,
   },
 
-  content: {
+  container: {
+    flexGrow: 1,
     width: "100%",
-    maxWidth: 540,
+    maxWidth: 560,
     alignSelf: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 22,
+  },
+
+  topRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 25,
+  },
+
+  backButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E2E8E2",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 13,
+  },
+
+  backArrow: {
+    color: "#173F2A",
+    fontSize: 30,
+    lineHeight: 31,
+    fontWeight: "500",
+    marginTop: -2,
+  },
+
+  pressed: {
+    opacity: 0.75,
+  },
+
+  progressArea: {
+    flex: 1,
   },
 
   progressTrack: {
-    width: "100%",
     height: 5,
+    backgroundColor: "#E2E7E2",
     borderRadius: 999,
-    backgroundColor: "#E5E7EB",
     overflow: "hidden",
-    marginBottom: 26,
   },
 
   progressFill: {
-    width: "22%",
+    width: "32%",
     height: "100%",
+    backgroundColor: "#4F7C5B",
     borderRadius: 999,
-    backgroundColor: "#16A34A",
+  },
+
+  progressText: {
+    color: "#8A938C",
+    fontSize: 9,
+    fontWeight: "700",
+    marginTop: 6,
   },
 
   coachRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 26,
+    marginBottom: 24,
   },
 
   coachIcon: {
-    width: 44,
-    height: 44,
+    width: 46,
+    height: 46,
     borderRadius: 15,
-    backgroundColor: "#DCFCE7",
-    borderWidth: 1,
-    borderColor: "#BBF7D0",
+    backgroundColor: "#E3F1E5",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 11,
   },
 
   coachEmoji: {
-    fontSize: 21,
+    fontSize: 22,
   },
 
   coachName: {
-    color: "#14532D",
+    color: "#173F2A",
     fontSize: 15,
     fontWeight: "900",
   },
 
   coachLabel: {
-    color: "#6B7280",
-    fontSize: 11,
+    color: "#7B857E",
+    fontSize: 10,
     fontWeight: "600",
     marginTop: 2,
   },
 
-  questionArea: {
-    marginBottom: 22,
+  hero: {
+    marginBottom: 20,
   },
 
-  smallGreeting: {
-    color: "#15803D",
-    fontSize: 13,
-    fontWeight: "800",
-    marginBottom: 8,
+  stepBadge: {
+    alignSelf: "flex-start",
+    backgroundColor: "#EAF4EA",
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginBottom: 12,
+  },
+
+  stepBadgeText: {
+    color: "#477253",
+    fontSize: 9,
+    fontWeight: "900",
+    letterSpacing: 0.9,
   },
 
   title: {
-    color: "#1F2937",
-    fontSize: 31,
-    lineHeight: 38,
+    color: "#202923",
+    fontSize: 32,
+    lineHeight: 39,
     fontWeight: "900",
+    letterSpacing: -0.6,
     marginBottom: 11,
   },
 
-  titleHighlight: {
-    color: "#14532D",
+  titleGreen: {
+    color: "#28623B",
   },
 
   subtitle: {
-    color: "#6B7280",
+    color: "#68736B",
     fontSize: 14,
     lineHeight: 21,
   },
 
-  optionsArea: {
-    marginBottom: 4,
-  },
-
-  option: {
-    width: "100%",
+  sectionCard: {
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#DDE8DE",
-    borderRadius: 18,
-    padding: 13,
-    marginBottom: 11,
+    borderColor: "#DEE6DE",
+    borderRadius: 22,
+    padding: 17,
+    marginBottom: 13,
+  },
+
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+
+  sectionLabel: {
+    color: "#477253",
+    fontSize: 10,
+    fontWeight: "900",
+    letterSpacing: 0.9,
+  },
+
+  sectionHint: {
+    color: "#929A94",
+    fontSize: 10,
+    marginTop: 3,
+  },
+
+  sectionIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 13,
+    backgroundColor: "#EEF5ED",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  sectionEmoji: {
+    fontSize: 19,
+  },
+
+  segment: {
+    flexDirection: "row",
+    backgroundColor: "#F1F4F0",
+    borderRadius: 14,
+    padding: 4,
+    marginBottom: 14,
+  },
+
+  segmentButton: {
+    flex: 1,
+    minHeight: 39,
+    borderRadius: 11,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  segmentButtonActive: {
+    backgroundColor: "#28623B",
+  },
+
+  segmentText: {
+    color: "#78817A",
+    fontSize: 12,
+    fontWeight: "800",
+  },
+
+  segmentTextActive: {
+    color: "#FFFFFF",
+  },
+
+  measurementRow: {
+    flexDirection: "row",
+    gap: 11,
+  },
+
+  measurementField: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
+    gap: 8,
   },
 
-  optionSelected: {
-    backgroundColor: "#F0FDF4",
-    borderColor: "#16A34A",
-    borderWidth: 2,
-  },
-
-  optionPressed: {
-    opacity: 0.9,
-  },
-
-  optionIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: "#F5F7F5",
+  singleMeasurement: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    marginRight: 11,
-    flexShrink: 0,
+    gap: 10,
   },
 
-  optionIconSelected: {
-    backgroundColor: "#DCFCE7",
-  },
-
-  optionEmoji: {
-    fontSize: 21,
-  },
-
-  optionTextArea: {
+  input: {
     flex: 1,
     minWidth: 0,
-  },
-
-  optionTitle: {
-    color: "#1F2937",
-    fontSize: 14,
-    lineHeight: 19,
+    height: 58,
+    backgroundColor: "#F8FAF7",
+    borderWidth: 1.5,
+    borderColor: "#DDE5DD",
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    color: "#202923",
+    fontSize: 22,
     fontWeight: "900",
-    marginBottom: 3,
   },
 
-  optionTitleSelected: {
-    color: "#14532D",
-  },
-
-  optionDescription: {
-    color: "#6B7280",
-    fontSize: 11,
-    lineHeight: 16,
-  },
-
-  checkCircle: {
-    width: 23,
-    height: 23,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#D1D5DB",
-    alignItems: "center",
-    justifyContent: "center",
-    marginLeft: 8,
-    flexShrink: 0,
-  },
-
-  checkCircleSelected: {
-    backgroundColor: "#16A34A",
-    borderColor: "#16A34A",
-  },
-
-  checkText: {
-    color: "#FFFFFF",
-    fontSize: 13,
+  unitLabel: {
+    color: "#5F6D63",
+    fontSize: 12,
     fontWeight: "900",
+  },
+
+  errorText: {
+    color: "#B65B5B",
+    fontSize: 10,
+    fontWeight: "700",
+    marginTop: 9,
   },
 
   responseCard: {
-    backgroundColor: "#F0FDF4",
-    borderWidth: 1,
-    borderColor: "#BBF7D0",
+    backgroundColor: "#EAF4EA",
     borderRadius: 18,
     padding: 14,
     flexDirection: "row",
-    marginTop: 4,
-    marginBottom: 17,
+    alignItems: "flex-start",
+    marginBottom: 13,
   },
 
   responseEmoji: {
     fontSize: 18,
-    marginRight: 9,
+    marginRight: 10,
   },
 
   responseTextArea: {
@@ -421,59 +694,103 @@ const styles = StyleSheet.create({
   },
 
   responseTitle: {
-    color: "#14532D",
-    fontSize: 13,
+    color: "#28563A",
+    fontSize: 12,
     fontWeight: "900",
-    marginBottom: 4,
+    marginBottom: 3,
   },
 
   responseText: {
-    color: "#4B5563",
+    color: "#607067",
+    fontSize: 10,
+    lineHeight: 16,
+  },
+
+  infoCard: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E1E7E1",
+    borderRadius: 18,
+    padding: 14,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  infoIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: "#F0F4ED",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 10,
+  },
+
+  infoEmoji: {
+    fontSize: 17,
+  },
+
+  infoTextArea: {
+    flex: 1,
+  },
+
+  infoTitle: {
+    color: "#35473A",
     fontSize: 11,
-    lineHeight: 17,
+    fontWeight: "900",
+    marginBottom: 3,
+  },
+
+  infoText: {
+    color: "#7B847D",
+    fontSize: 10,
+    lineHeight: 15,
+  },
+
+  bottomArea: {
+    marginTop: "auto",
+    paddingTop: 25,
+    paddingBottom: 8,
   },
 
   button: {
-    width: "100%",
-    minHeight: 56,
-    backgroundColor: "#14532D",
-    borderRadius: 18,
+    minHeight: 58,
+    backgroundColor: "#28623B",
+    borderRadius: 19,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 18,
-    marginTop: 5,
-    marginBottom: 10,
-
-    shadowColor: "#14532D",
-    shadowOpacity: 0.15,
-    shadowRadius: 9,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    elevation: 3,
+    paddingHorizontal: 20,
   },
 
   buttonDisabled: {
-    opacity: 0.35,
+    backgroundColor: "#C9D5CB",
   },
 
   buttonPressed: {
-    opacity: 0.88,
+    opacity: 0.9,
     transform: [{ scale: 0.99 }],
   },
 
   buttonText: {
     color: "#FFFFFF",
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: "900",
   },
 
   buttonArrow: {
     color: "#FFFFFF",
-    fontSize: 20,
+    fontSize: 21,
     fontWeight: "900",
-    marginLeft: 8,
+    marginLeft: 9,
+  },
+
+  bottomText: {
+    color: "#8A928C",
+    fontSize: 10,
+    lineHeight: 15,
+    textAlign: "center",
+    marginTop: 11,
+    paddingHorizontal: 15,
   },
 });

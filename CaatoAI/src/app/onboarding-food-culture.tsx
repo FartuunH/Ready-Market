@@ -48,7 +48,7 @@ export default function OnboardingFoodCultureScreen() {
 
     router.push({
       // Temporary until we create the next onboarding screen.
-      pathname: "/onboarding-womens-health",
+      pathname: "/onboarding-location",
       params: {
         ...params,
         foodCulture: selectedFood.id,

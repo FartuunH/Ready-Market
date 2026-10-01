@@ -10,24 +10,18 @@ function numberValue(value?: string | string[]) {
 
 function calculatePlan(params: Record<string, string | string[] | undefined>) {
   const age = numberValue(params.age);
-  const currentWeight = numberValue(params.currentWeight);
 
-  let weightKg = currentWeight;
+  const weightKg =
+    numberValue(params.currentWeightKg) ||
+    (params.weightUnit === "lbs"
+      ? numberValue(params.currentWeight) * 0.453592
+      : numberValue(params.currentWeight));
 
-  if (params.weightUnit === "lb") {
-    weightKg = currentWeight * 0.453592;
-  }
-
-  let heightCm = numberValue(params.heightCm);
-
-  // Keep current calculator behavior for now.
-  // We will fix and verify this separately after the redesign.
-  if (params.heightUnit === "ft" || params.heightUnit === "ft / in") {
-    const feet = numberValue(params.feet);
-    const inches = numberValue(params.inches);
-
-    heightCm = (feet * 12 + inches) * 2.54;
-  }
+  const heightCm =
+    numberValue(params.heightCm) ||
+    (params.heightUnit === "imperial"
+      ? (numberValue(params.feet) * 12 + numberValue(params.inches)) * 2.54
+      : numberValue(params.centimeters));
 
   const activityMultipliers: Record<string, number> = {
     "not-active": 1.2,

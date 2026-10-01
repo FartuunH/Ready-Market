@@ -1,15 +1,15 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
-    Keyboard,
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 
 type WeightUnit = "lb" | "kg";
@@ -47,7 +47,7 @@ export default function OnboardingGoalWeightScreen() {
     Keyboard.dismiss();
 
     router.push({
-      pathname: "/onboarding-movement",
+      pathname: "/onboarding-womens-health",
       params: {
         ...params,
         goalWeight,

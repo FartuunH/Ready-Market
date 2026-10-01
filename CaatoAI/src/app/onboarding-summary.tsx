@@ -65,7 +65,7 @@ export default function OnboardingSummaryScreen() {
       // Temporary.
       // After this screen is tested, we will build the
       // "CaatoAI is building your plan" screen.
-      pathname: "/plan-ready",
+      pathname: "/onboarding-building-plan",
       params: {
         ...params,
       },

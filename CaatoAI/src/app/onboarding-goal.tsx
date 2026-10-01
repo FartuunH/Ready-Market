@@ -13,14 +13,19 @@ import {
 } from "react-native";
 
 export default function OnboardingGoalScreen() {
-  const { name } = useLocalSearchParams<{
+  const params = useLocalSearchParams<{
     name?: string;
+    motivation?: string;
+    barriers?: string;
   }>();
 
   const [age, setAge] = useState("");
 
   const ageNumber = Number(age);
-  const canContinue = age.trim().length > 0 && ageNumber >= 18;
+
+  const hasAge = age.trim().length > 0;
+  const isAdult = hasAge && ageNumber >= 18;
+  const canContinue = isAdult;
 
   const continueNext = () => {
     if (!canContinue) return;
@@ -30,7 +35,7 @@ export default function OnboardingGoalScreen() {
     router.push({
       pathname: "/onboarding-body",
       params: {
-        name,
+        ...params,
         age,
       },
     });
@@ -39,7 +44,7 @@ export default function OnboardingGoalScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.screen}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -47,11 +52,31 @@ export default function OnboardingGoalScreen() {
         keyboardDismissMode="on-drag"
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.content}>
-          <View style={styles.progressTrack}>
-            <View style={styles.progressFill} />
+        <View style={styles.container}>
+          {/* Top */}
+          <View style={styles.topRow}>
+            <Pressable
+              onPress={() => router.back()}
+              style={({ pressed }) => [
+                styles.backButton,
+                pressed && styles.pressed,
+              ]}
+            >
+              <Text style={styles.backArrow}>‹</Text>
+            </Pressable>
+
+            <View style={styles.progressArea}>
+              <View style={styles.progressTrack}>
+                <View style={styles.progressFill} />
+              </View>
+
+              <Text style={styles.progressText}>
+                Waxaan kuu dhisaynaa qorshe kuu gaar ah
+              </Text>
+            </View>
           </View>
 
+          {/* Coach */}
           <View style={styles.coachRow}>
             <View style={styles.coachIcon}>
               <Text style={styles.coachEmoji}>🌿</Text>
@@ -59,92 +84,149 @@ export default function OnboardingGoalScreen() {
 
             <View>
               <Text style={styles.coachName}>CaatoAI</Text>
-              <Text style={styles.coachLabel}>Aan is sii baranno</Text>
+              <Text style={styles.coachLabel}>Aan wax yar kaa sii baranno</Text>
             </View>
           </View>
 
-          <View style={styles.greetingCard}>
-            <Text style={styles.greetingEmoji}>💚</Text>
+          {/* Personal message */}
+          <View style={styles.personalCard}>
+            <Text style={styles.personalEmoji}>💚</Text>
 
-            <Text style={styles.greetingText}>
-              Waan ku faraxsanahay inaan kula kulmo,{" "}
-              <Text style={styles.greetingName}>{name || "saaxiib"}.</Text>
+            <Text style={styles.personalText}>
+              {params.name
+                ? `${params.name}, hadda waxaan bilaabaynaa xogta naga caawinaysa inaan qorshahaaga si fiican kuu waafajino.`
+                : "Hadda waxaan bilaabaynaa xogta naga caawinaysa inaan qorshahaaga si fiican kuu waafajino."}
             </Text>
           </View>
 
-          <View style={styles.questionArea}>
+          {/* Question */}
+          <View style={styles.hero}>
+            <View style={styles.stepBadge}>
+              <Text style={styles.stepBadgeText}>ADIGA</Text>
+            </View>
+
             <Text style={styles.title}>
               Immisa jir{"\n"}
-              <Text style={styles.titleHighlight}>ayaad tahay?</Text>
+              <Text style={styles.titleGreen}>ayaad tahay?</Text>
             </Text>
 
             <Text style={styles.subtitle}>
-              Da&apos;daadu waxay CaatoAI ka caawinaysaa inuu kuu sameeyo qorshe
-              ku habboon jirkaaga iyo marxaladda noloshaada.
+              Da'daadu waxay naga caawinaysaa inaan talooyinka iyo qorshaha
+              bilowga ah ku waafajino marxaladda noloshaada.
             </Text>
           </View>
 
-          <View style={styles.inputCard}>
-            <Text style={styles.label}>Da&apos;daada</Text>
+          {/* Age input */}
+          <View
+            style={[
+              styles.inputCard,
+              hasAge && !isAdult && styles.inputCardError,
+              isAdult && styles.inputCardValid,
+            ]}
+          >
+            <View style={styles.inputTopRow}>
+              <View>
+                <Text style={styles.inputLabel}>DA'DAADA</Text>
+                <Text style={styles.inputHint}>Geli da'daada hadda</Text>
+              </View>
+
+              <View style={styles.ageIcon}>
+                <Text style={styles.ageEmoji}>🎂</Text>
+              </View>
+            </View>
 
             <View style={styles.ageInputRow}>
               <TextInput
                 value={age}
                 onChangeText={(value) => {
                   const cleanAge = value.replace(/[^0-9]/g, "").slice(0, 3);
+
                   setAge(cleanAge);
                 }}
-                placeholder="Tusaale: 32"
-                placeholderTextColor="#9CA3AF"
+                placeholder="32"
+                placeholderTextColor="#B1B8B2"
                 keyboardType="number-pad"
                 returnKeyType="done"
                 onSubmitEditing={continueNext}
-                style={styles.input}
                 maxLength={3}
+                style={styles.input}
               />
 
-              {age.trim().length > 0 && (
+              <Text style={styles.yearText}>jir</Text>
+
+              {hasAge && (
                 <View
                   style={[
-                    styles.ageStatus,
-                    canContinue
-                      ? styles.ageStatusValid
-                      : styles.ageStatusInvalid,
+                    styles.statusCircle,
+                    isAdult
+                      ? styles.statusCircleValid
+                      : styles.statusCircleInvalid,
                   ]}
                 >
                   <Text
                     style={[
-                      styles.ageStatusText,
-                      canContinue
-                        ? styles.ageStatusTextValid
-                        : styles.ageStatusTextInvalid,
+                      styles.statusText,
+                      isAdult
+                        ? styles.statusTextValid
+                        : styles.statusTextInvalid,
                     ]}
                   >
-                    {canContinue ? "✓" : "18+"}
+                    {isAdult ? "✓" : "18+"}
                   </Text>
                 </View>
               )}
             </View>
-
-            {age.trim().length > 0 && ageNumber < 18 && (
-              <Text style={styles.errorText}>
-                CaatoAI hadda waxaa loogu talagalay dadka waaweyn ee 18 jir iyo
-                ka weyn.
-              </Text>
-            )}
           </View>
 
-          {canContinue && (
-            <View style={styles.responseCard}>
-              <Text style={styles.responseEmoji}>✨</Text>
+          {/* Under 18 */}
+          {hasAge && !isAdult && (
+            <View style={styles.warningCard}>
+              <Text style={styles.warningEmoji}>🌱</Text>
 
-              <Text style={styles.responseText}>
-                Mahadsanid, {name || "saaxiib"}. Waxaan xogtan u isticmaali
-                doonaa inaan qorshahaaga si fiican kuu waafajiyo.
-              </Text>
+              <View style={styles.warningTextArea}>
+                <Text style={styles.warningTitle}>CaatoAI hadda waa 18+</Text>
+
+                <Text style={styles.warningText}>
+                  Qorshayaasha CaatoAI hadda waxaa loogu talagalay dadka waaweyn
+                  ee 18 jir iyo ka weyn.
+                </Text>
+              </View>
             </View>
           )}
 
+          {/* Valid response */}
+          {isAdult && (
+            <View style={styles.responseCard}>
+              <Text style={styles.responseEmoji}>✨</Text>
+
+              <View style={styles.responseTextArea}>
+                <Text style={styles.responseTitle}>Mahadsanid.</Text>
+
+                <Text style={styles.responseText}>
+                  Waxaan xogtan ku dari doonaa macluumaadka kale ee aad na
+                  siisay si qorshahaagu adiga kuugu habboonaado.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Why we ask */}
+          <View style={styles.whyCard}>
+            <View style={styles.whyIcon}>
+              <Text style={styles.whyEmoji}>🧠</Text>
+            </View>
+
+            <View style={styles.whyTextArea}>
+              <Text style={styles.whyTitle}>Maxaan tan kuu weydiinaynaa?</Text>
+
+              <Text style={styles.whyText}>
+                Da'du waa mid ka mid ah xogaha CaatoAI isticmaalo marka uu
+                diyaarinayo talooyin ku habboon qofka.
+              </Text>
+            </View>
+          </View>
+
+          {/* Bottom */}
           <View style={styles.bottomArea}>
             <Pressable
               disabled={!canContinue}
@@ -160,7 +242,8 @@ export default function OnboardingGoalScreen() {
             </Pressable>
 
             <Text style={styles.privacyText}>
-              🔒 Jawaabahaaga waxaa loo isticmaalaa shakhsiyeynta qorshahaaga.
+              🔒 Da'daada iyo jawaabahaaga waxaa loo isticmaalaa shakhsiyeynta
+              khibraddaada CaatoAI.
             </Text>
           </View>
         </View>
@@ -172,146 +255,218 @@ export default function OnboardingGoalScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#FFFBF5",
+    backgroundColor: "#FBF8F1",
   },
 
   scrollContent: {
     flexGrow: 1,
-    paddingVertical: 20,
+    paddingVertical: 18,
   },
 
-  content: {
+  container: {
     flexGrow: 1,
     width: "100%",
-    maxWidth: 540,
+    maxWidth: 560,
     alignSelf: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 22,
+  },
+
+  topRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 25,
+  },
+
+  backButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E2E8E2",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 13,
+  },
+
+  backArrow: {
+    color: "#173F2A",
+    fontSize: 30,
+    lineHeight: 31,
+    fontWeight: "500",
+    marginTop: -2,
+  },
+
+  pressed: {
+    opacity: 0.75,
+  },
+
+  progressArea: {
+    flex: 1,
   },
 
   progressTrack: {
-    width: "100%",
     height: 5,
+    backgroundColor: "#E2E7E2",
     borderRadius: 999,
-    backgroundColor: "#E5E7EB",
     overflow: "hidden",
-    marginBottom: 28,
   },
 
   progressFill: {
-    width: "15%",
+    width: "26%",
     height: "100%",
+    backgroundColor: "#4F7C5B",
     borderRadius: 999,
-    backgroundColor: "#16A34A",
+  },
+
+  progressText: {
+    color: "#8A938C",
+    fontSize: 9,
+    fontWeight: "700",
+    marginTop: 6,
   },
 
   coachRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 18,
+    marginBottom: 17,
   },
 
   coachIcon: {
-    width: 44,
-    height: 44,
+    width: 46,
+    height: 46,
     borderRadius: 15,
-    backgroundColor: "#DCFCE7",
-    borderWidth: 1,
-    borderColor: "#BBF7D0",
+    backgroundColor: "#E3F1E5",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 11,
   },
 
   coachEmoji: {
-    fontSize: 21,
+    fontSize: 22,
   },
 
   coachName: {
-    color: "#14532D",
+    color: "#173F2A",
     fontSize: 15,
     fontWeight: "900",
   },
 
   coachLabel: {
-    color: "#6B7280",
-    fontSize: 11,
+    color: "#7B857E",
+    fontSize: 10,
     fontWeight: "600",
     marginTop: 2,
   },
 
-  greetingCard: {
-    backgroundColor: "#F0FDF4",
-    borderWidth: 1,
-    borderColor: "#DCFCE7",
-    borderRadius: 18,
-    padding: 14,
+  personalCard: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 28,
+    backgroundColor: "#EDF5EC",
+    borderRadius: 16,
+    padding: 13,
+    marginBottom: 23,
   },
 
-  greetingEmoji: {
-    fontSize: 18,
+  personalEmoji: {
+    fontSize: 17,
     marginRight: 9,
   },
 
-  greetingText: {
+  personalText: {
     flex: 1,
-    color: "#4B5563",
-    fontSize: 13,
-    lineHeight: 19,
+    color: "#52685A",
+    fontSize: 11,
+    lineHeight: 17,
     fontWeight: "600",
   },
 
-  greetingName: {
-    color: "#14532D",
-    fontWeight: "900",
+  hero: {
+    marginBottom: 21,
   },
 
-  questionArea: {
-    marginBottom: 26,
-  },
-
-  title: {
-    color: "#1F2937",
-    fontSize: 34,
-    lineHeight: 41,
-    fontWeight: "900",
+  stepBadge: {
+    alignSelf: "flex-start",
+    backgroundColor: "#EAF4EA",
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
     marginBottom: 12,
   },
 
-  titleHighlight: {
-    color: "#14532D",
+  stepBadgeText: {
+    color: "#477253",
+    fontSize: 9,
+    fontWeight: "900",
+    letterSpacing: 1,
+  },
+
+  title: {
+    color: "#202923",
+    fontSize: 33,
+    lineHeight: 40,
+    fontWeight: "900",
+    letterSpacing: -0.6,
+    marginBottom: 11,
+  },
+
+  titleGreen: {
+    color: "#28623B",
   },
 
   subtitle: {
-    color: "#6B7280",
-    fontSize: 15,
-    lineHeight: 23,
+    color: "#68736B",
+    fontSize: 14,
+    lineHeight: 21,
   },
 
   inputCard: {
     backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#DDE8DE",
+    borderWidth: 1.5,
+    borderColor: "#E0E7E0",
     borderRadius: 22,
     padding: 17,
-
-    shadowColor: "#000",
-    shadowOpacity: 0.04,
-    shadowRadius: 10,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    elevation: 2,
   },
 
-  label: {
-    color: "#14532D",
-    fontSize: 13,
+  inputCardValid: {
+    borderColor: "#AFCDB5",
+  },
+
+  inputCardError: {
+    borderColor: "#E7C3C3",
+  },
+
+  inputTopRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 15,
+  },
+
+  inputLabel: {
+    color: "#477253",
+    fontSize: 10,
     fontWeight: "900",
-    marginBottom: 9,
+    letterSpacing: 0.9,
+  },
+
+  inputHint: {
+    color: "#929A94",
+    fontSize: 10,
+    marginTop: 3,
+  },
+
+  ageIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 13,
+    backgroundColor: "#EEF5ED",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  ageEmoji: {
+    fontSize: 19,
   },
 
   ageInputRow: {
@@ -321,135 +476,203 @@ const styles = StyleSheet.create({
 
   input: {
     flex: 1,
-    minHeight: 55,
-    backgroundColor: "#F9FCF9",
-    borderWidth: 1.5,
-    borderColor: "#D6E8D9",
+    minHeight: 62,
+    backgroundColor: "#F8FAF7",
+    borderWidth: 1,
+    borderColor: "#E1E7E1",
     borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    color: "#1F2937",
-    fontSize: 18,
-    fontWeight: "800",
+    paddingHorizontal: 17,
+    color: "#202923",
+    fontSize: 25,
+    fontWeight: "900",
   },
 
-  ageStatus: {
-    width: 44,
-    height: 44,
+  yearText: {
+    color: "#667169",
+    fontSize: 13,
+    fontWeight: "800",
+    marginLeft: 10,
+  },
+
+  statusCircle: {
+    width: 43,
+    height: 43,
     borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
     marginLeft: 10,
   },
 
-  ageStatusValid: {
-    backgroundColor: "#DCFCE7",
+  statusCircleValid: {
+    backgroundColor: "#E0F1E3",
   },
 
-  ageStatusInvalid: {
-    backgroundColor: "#FEF2F2",
+  statusCircleInvalid: {
+    backgroundColor: "#FCEAEA",
   },
 
-  ageStatusText: {
+  statusText: {
     fontWeight: "900",
   },
 
-  ageStatusTextValid: {
-    color: "#16A34A",
+  statusTextValid: {
+    color: "#347147",
     fontSize: 18,
   },
 
-  ageStatusTextInvalid: {
-    color: "#DC2626",
-    fontSize: 12,
+  statusTextInvalid: {
+    color: "#B95C5C",
+    fontSize: 11,
   },
 
-  errorText: {
-    color: "#B91C1C",
-    fontSize: 11,
-    lineHeight: 17,
-    marginTop: 10,
-    fontWeight: "600",
+  warningCard: {
+    marginTop: 14,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    backgroundColor: "#FFF5F2",
+    borderRadius: 18,
+    padding: 14,
+  },
+
+  warningEmoji: {
+    fontSize: 18,
+    marginRight: 10,
+  },
+
+  warningTextArea: {
+    flex: 1,
+  },
+
+  warningTitle: {
+    color: "#8F4949",
+    fontSize: 12,
+    fontWeight: "900",
+    marginBottom: 3,
+  },
+
+  warningText: {
+    color: "#826565",
+    fontSize: 10,
+    lineHeight: 16,
   },
 
   responseCard: {
-    marginTop: 15,
-    padding: 14,
-    borderRadius: 17,
-    backgroundColor: "#F0FDF4",
-    borderWidth: 1,
-    borderColor: "#DCFCE7",
+    marginTop: 14,
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
+    backgroundColor: "#EAF4EA",
+    borderRadius: 18,
+    padding: 14,
   },
 
   responseEmoji: {
     fontSize: 18,
-    marginRight: 9,
+    marginRight: 10,
+  },
+
+  responseTextArea: {
+    flex: 1,
+  },
+
+  responseTitle: {
+    color: "#28563A",
+    fontSize: 12,
+    fontWeight: "900",
+    marginBottom: 3,
   },
 
   responseText: {
+    color: "#607067",
+    fontSize: 10,
+    lineHeight: 16,
+  },
+
+  whyCard: {
+    marginTop: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E1E7E1",
+    borderRadius: 18,
+    padding: 14,
+  },
+
+  whyIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: "#F0F4ED",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 10,
+  },
+
+  whyEmoji: {
+    fontSize: 17,
+  },
+
+  whyTextArea: {
     flex: 1,
-    color: "#4B5563",
-    fontSize: 13,
-    lineHeight: 19,
-    fontWeight: "600",
+  },
+
+  whyTitle: {
+    color: "#35473A",
+    fontSize: 11,
+    fontWeight: "900",
+    marginBottom: 3,
+  },
+
+  whyText: {
+    color: "#7B847D",
+    fontSize: 10,
+    lineHeight: 15,
   },
 
   bottomArea: {
     marginTop: "auto",
-    paddingTop: 30,
+    paddingTop: 27,
+    paddingBottom: 8,
   },
 
   button: {
-    width: "100%",
-    minHeight: 56,
-    backgroundColor: "#14532D",
-    borderRadius: 18,
+    minHeight: 58,
+    backgroundColor: "#28623B",
+    borderRadius: 19,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 18,
-
-    shadowColor: "#14532D",
-    shadowOpacity: 0.15,
-    shadowRadius: 9,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    elevation: 3,
+    paddingHorizontal: 20,
   },
 
   buttonDisabled: {
-    opacity: 0.35,
+    backgroundColor: "#C9D5CB",
   },
 
   buttonPressed: {
-    opacity: 0.88,
+    opacity: 0.9,
     transform: [{ scale: 0.99 }],
   },
 
   buttonText: {
     color: "#FFFFFF",
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: "900",
   },
 
   buttonArrow: {
     color: "#FFFFFF",
-    fontSize: 20,
+    fontSize: 21,
     fontWeight: "900",
-    marginLeft: 8,
+    marginLeft: 9,
   },
 
   privacyText: {
-    marginTop: 13,
-    paddingHorizontal: 12,
-    textAlign: "center",
-    color: "#6B7280",
+    color: "#8A928C",
     fontSize: 10,
-    lineHeight: 16,
-    fontWeight: "600",
+    lineHeight: 15,
+    textAlign: "center",
+    marginTop: 11,
+    paddingHorizontal: 15,
   },
 });

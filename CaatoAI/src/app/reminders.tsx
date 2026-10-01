@@ -1,1004 +1,1163 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import * as Notifications from "expo-notifications";
-import { router, useLocalSearchParams } from "expo-router";
+
 import { useEffect, useState } from "react";
+
 import {
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Switch,
-    Text,
-    TextInput,
-    View,
+  Alert,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 
+const REMINDER_KEY = "caatoai-reminder-settings-v1";
+
+type DailyReminder = {
+  enabled: boolean;
+
+  time: string;
+};
+
+type WeeklyReminder = DailyReminder & {
+  weekday: number; // 1 Sunday ... 7 Saturday (Expo calendar trigger)
+};
+
 type ReminderSettings = {
-  morningEnabled: boolean;
-  morningTime: string;
+  water: DailyReminder;
+  breakfast: DailyReminder;
+  lunch: DailyReminder;
+  dinner: DailyReminder;
+  walking: DailyReminder;
 
-  breakfastEnabled: boolean;
-  breakfastTime: string;
+  workout: DailyReminder;
+  fasting: DailyReminder;
+  lesson: DailyReminder;
 
-  lunchEnabled: boolean;
-  lunchTime: string;
-
-  dinnerEnabled: boolean;
-  dinnerTime: string;
-
-  waterEnabled: boolean;
-  waterTime: string;
-
-  stepsEnabled: boolean;
-  stepsTime: string;
-
-  workoutEnabled: boolean;
-  workoutTime: string;
-
-  weighInEnabled: boolean;
-  weighInTime: string;
-  weighInDay: number;
+  weighIn: WeeklyReminder;
+  weeklyPlan: WeeklyReminder;
 };
 
-const STORAGE_KEY = "caatoai-reminder-settings";
-const IDS_KEY = "caatoai-reminder-notification-ids";
-const PLAN_KEY = "caatoai-reminder-plan-signature";
+const DEFAULTS: ReminderSettings = {
+  water: { enabled: true, time: "10:00" },
+  breakfast: { enabled: true, time: "08:00" },
+  lunch: { enabled: true, time: "13:00" },
+  dinner: { enabled: true, time: "18:30" },
+  walking: { enabled: true, time: "17:00" },
 
-const getDefaultSettings = (
-  eatingStyle: string,
-  workout: string,
-  isBreastfeeding: boolean,
-): ReminderSettings => {
-  const safeEatingStyle =
-    isBreastfeeding && (eatingStyle === "fasting" || eatingStyle === "omad")
-      ? "regular"
-      : eatingStyle;
+  workout: { enabled: true, time: "18:00" },
+  fasting: { enabled: false, time: "18:00" },
+  lesson: { enabled: true, time: "20:00" },
 
-  return {
-    morningEnabled: true,
-    morningTime: "08:00",
-
-    breakfastEnabled: safeEatingStyle === "regular",
-    breakfastTime: "08:30",
-
-    lunchEnabled:
-      safeEatingStyle === "regular" || safeEatingStyle === "fasting",
-    lunchTime: "13:00",
-
-    dinnerEnabled:
-      safeEatingStyle === "regular" ||
-      safeEatingStyle === "fasting" ||
-      safeEatingStyle === "omad",
-    dinnerTime: "18:30",
-
-    waterEnabled: true,
-    waterTime: "15:00",
-
-    stepsEnabled: true,
-    stepsTime: "18:00",
-
-    workoutEnabled:
-      workout === "home" || workout === "gym" || workout === "mixed",
-
-    workoutTime: "17:00",
-
-    weighInEnabled: true,
-    weighInTime: "09:00",
-    weighInDay: 2,
-  };
+  weighIn: { enabled: true, time: "09:00", weekday: 1 },
+  weeklyPlan: { enabled: true, time: "19:00", weekday: 1 },
 };
-const days = [
-  { label: "Axad", value: 1 },
-  { label: "Isniin", value: 2 },
-  { label: "Talaado", value: 3 },
-  { label: "Arbaco", value: 4 },
-  { label: "Khamiis", value: 5 },
-  { label: "Jimco", value: 6 },
-  { label: "Sabti", value: 7 },
+const DAYS = [
+  { value: 1, label: "Axad" },
+
+  { value: 2, label: "Isniin" },
+
+  { value: 3, label: "Talaado" },
+
+  { value: 4, label: "Arbaco" },
+
+  { value: 5, label: "Khamiis" },
+
+  { value: 6, label: "Jimco" },
+
+  { value: 7, label: "Sabti" },
 ];
 
-export default function RemindersScreen() {
-  const params = useLocalSearchParams();
+function parseTime(value: string) {
+  const match = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(value.trim());
 
-  const eatingStyle =
-    typeof params.eatingStyle === "string" ? params.eatingStyle : "regular";
+  if (!match) return null;
 
-  const fastingStartTime =
-    typeof params.fastingStartTime === "string"
-      ? params.fastingStartTime
-      : "12:00";
+  return { hour: Number(match[1]), minute: Number(match[2]) };
+}
 
-  const fastingEndTime =
-    typeof params.fastingEndTime === "string" ? params.fastingEndTime : "20:00";
+function to12Hour(value: string) {
+  const parsed = parseTime(value);
 
-  const omadMealTime =
-    typeof params.omadMealTime === "string" ? params.omadMealTime : "18:00";
+  if (!parsed) return { time: value, period: "AM" as "AM" | "PM" };
 
-  const workout =
-    typeof params.workout === "string" ? params.workout : "walking";
+  const period: "AM" | "PM" = parsed.hour >= 12 ? "PM" : "AM";
 
-  const breastfeeding =
-    typeof params.breastfeeding === "string"
-      ? params.breastfeeding
-      : "not-breastfeeding";
+  const hour12 = parsed.hour % 12 || 12;
 
-  const isBreastfeeding =
-    breastfeeding === "partial" || breastfeeding === "exclusive";
+  return {
+    time: `${hour12}:${String(parsed.minute).padStart(2, "0")}`,
 
-  const planDefaults = getDefaultSettings(
-    eatingStyle,
-    workout,
-    isBreastfeeding,
-  );
+    period,
+  };
+}
 
-  const [settings, setSettings] = useState<ReminderSettings>(planDefaults);
+function to24Hour(value: string, period: "AM" | "PM") {
+  const match = /^(0?[1-9]|1[0-2]):([0-5]\d)$/.exec(value.trim());
 
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  if (!match) return null;
 
-  useEffect(() => {
-    loadSettings();
-  }, []);
+  let hour = Number(match[1]);
 
-  const loadSettings = async () => {
-    try {
-      const saved = await AsyncStorage.getItem(STORAGE_KEY);
-      const savedPlanSignature = await AsyncStorage.getItem(PLAN_KEY);
+  const minute = Number(match[2]);
 
-      const currentPlanSignature = `${eatingStyle}|${workout}|${breastfeeding}`;
+  if (period === "AM" && hour === 12) hour = 0;
 
-      if (saved && savedPlanSignature === currentPlanSignature) {
-        const parsed = JSON.parse(saved);
+  if (period === "PM" && hour !== 12) hour += 12;
 
-        setSettings({
-          ...planDefaults,
-          ...parsed,
-        });
-      } else {
-        setSettings(planDefaults);
+  return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+}
 
-        await AsyncStorage.setItem(PLAN_KEY, currentPlanSignature);
-      }
-    } catch (error) {
-      console.log("Reminder settings load error:", error);
-      setSettings(planDefaults);
-    } finally {
-      setLoading(false);
+async function requestNotificationPermission() {
+  if (Platform.OS === "web") return false;
+
+  const current = await Notifications.getPermissionsAsync();
+
+  if (current.granted) return true;
+
+  const requested = await Notifications.requestPermissionsAsync();
+
+  return requested.granted;
+}
+
+async function scheduleDaily(
+  identifier: string,
+
+  title: string,
+
+  body: string,
+
+  time: string,
+) {
+  const parsed = parseTime(time);
+
+  if (!parsed) throw new Error(`Waqtiga ${time} sax ma aha.`);
+
+  await Notifications.scheduleNotificationAsync({
+    identifier,
+
+    content: { title, body, sound: true },
+
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.DAILY,
+
+      hour: parsed.hour,
+
+      minute: parsed.minute,
+    },
+  });
+}
+
+async function scheduleWeekly(
+  identifier: string,
+
+  title: string,
+
+  body: string,
+
+  time: string,
+
+  weekday: number,
+) {
+  const parsed = parseTime(time);
+
+  if (!parsed) throw new Error(`Waqtiga ${time} sax ma aha.`);
+
+  await Notifications.scheduleNotificationAsync({
+    identifier,
+
+    content: { title, body, sound: true },
+
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
+
+      weekday,
+
+      hour: parsed.hour,
+
+      minute: parsed.minute,
+    },
+  });
+}
+
+function TimeField({
+  value,
+
+  onChange,
+}: {
+  value: string;
+
+  onChange: (value: string) => void;
+}) {
+  const display = to12Hour(value);
+
+  const changeTime = (newTime: string) => {
+    const converted = to24Hour(newTime, display.period);
+
+    if (converted) {
+      onChange(converted);
     }
   };
 
-  const updateSetting = <K extends keyof ReminderSettings>(
-    key: K,
-    value: ReminderSettings[K],
-  ) => {
-    setSettings((current) => ({
-      ...current,
-      [key]: value,
-    }));
-  };
+  const changePeriod = (period: "AM" | "PM") => {
+    const converted = to24Hour(display.time, period);
 
-  const parseTime = (time: string) => {
-    const match = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(time.trim());
-
-    if (!match) {
-      return null;
-    }
-
-    return {
-      hour: Number(match[1]),
-      minute: Number(match[2]),
-    };
-  };
-
-  const cancelCaatoReminders = async () => {
-    try {
-      const savedIds = await AsyncStorage.getItem(IDS_KEY);
-
-      if (!savedIds) {
-        return;
-      }
-
-      const ids: string[] = JSON.parse(savedIds);
-
-      for (const id of ids) {
-        await Notifications.cancelScheduledNotificationAsync(id);
-      }
-
-      await AsyncStorage.removeItem(IDS_KEY);
-    } catch (error) {
-      console.log("Cancel reminder error:", error);
+    if (converted) {
+      onChange(converted);
     }
   };
-
-  const scheduleDaily = async (title: string, body: string, time: string) => {
-    const parsed = parseTime(time);
-
-    if (!parsed) {
-      throw new Error(`Waqtiga "${time}" sax ma aha. Isticmaal sida 08:30.`);
-    }
-
-    return Notifications.scheduleNotificationAsync({
-      content: {
-        title,
-        body,
-        sound: true,
-      },
-
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.DAILY,
-        hour: parsed.hour,
-        minute: parsed.minute,
-      },
-    });
-  };
-
-  const scheduleWeekly = async (
-    title: string,
-    body: string,
-    time: string,
-    weekday: number,
-  ) => {
-    const parsed = parseTime(time);
-
-    if (!parsed) {
-      throw new Error(`Waqtiga "${time}" sax ma aha. Isticmaal sida 09:00.`);
-    }
-
-    return Notifications.scheduleNotificationAsync({
-      content: {
-        title,
-        body,
-        sound: true,
-      },
-
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
-        weekday,
-        hour: parsed.hour,
-        minute: parsed.minute,
-      },
-    });
-  };
-
-  const saveAndSchedule = async () => {
-    setSaving(true);
-
-    try {
-      const permission = await Notifications.requestPermissionsAsync();
-
-      if (permission.status !== "granted") {
-        Alert.alert(
-          "Notifications lama oggola",
-          "Fadlan oggolow notifications-ka CaatoAI si xasuusintu kuu soo gaarto.",
-        );
-        return;
-      }
-
-      await cancelCaatoReminders();
-
-      const ids: string[] = [];
-
-      if (settings.morningEnabled) {
-        ids.push(
-          await scheduleDaily(
-            "Subax wanaagsan 💜",
-            "Maanta waa maalin cusub. Aan si tartiib ah uga shaqayno hadafyadaada.",
-            settings.morningTime,
-          ),
-        );
-      }
-
-      if (settings.breakfastEnabled) {
-        ids.push(
-          await scheduleDaily(
-            "CaatoAI 🍳",
-            "Waa waqtigii quraacda. Xasuuso inaad ku darto protein iyo cunto ku filan.",
-            settings.breakfastTime,
-          ),
-        );
-      }
-
-      if (settings.lunchEnabled) {
-        ids.push(
-          await scheduleDaily(
-            "CaatoAI 🥗",
-            "Qadadu way dhowdahay. Dooro cunto ku taageerta qorshahaaga adigoon is gaajaysiin.",
-            settings.lunchTime,
-          ),
-        );
-      }
-
-      if (settings.dinnerEnabled) {
-        ids.push(
-          await scheduleDaily(
-            "CaatoAI 🍽️",
-            "Waa waqtigii cashada. Cunto dheellitiran cun oo si deggan u raaxayso.",
-            settings.dinnerTime,
-          ),
-        );
-      }
-
-      if (settings.waterEnabled) {
-        ids.push(
-          await scheduleDaily(
-            "CaatoAI 💧",
-            "Sidee biyahaagu maanta yihiin? Haddii aad ka dambayso, koob biyo ah hadda cab.",
-            settings.waterTime,
-          ),
-        );
-      }
-
-      if (settings.stepsEnabled) {
-        ids.push(
-          await scheduleDaily(
-            "CaatoAI 🚶",
-            "Haddii aad awooddo, socod yar ayaa kaa caawin kara inaad ku dhowaato hadafka tallaabooyinka maanta.",
-            settings.stepsTime,
-          ),
-        );
-      }
-
-      if (settings.workoutEnabled) {
-        ids.push(
-          await scheduleDaily(
-            "CaatoAI 💪",
-            "Jimicsiga maanta ma sameysay? Xitaa dhaqdhaqaaq gaaban waa horumar.",
-            settings.workoutTime,
-          ),
-        );
-      }
-
-      if (settings.weighInEnabled) {
-        ids.push(
-          await scheduleWeekly(
-            "CaatoAI ⚖️",
-            "Waa waqtigii miisaanka toddobaadlaha ahaa. Hal cabbir kaliya ma qeexayo horumarkaaga.",
-            settings.weighInTime,
-            settings.weighInDay,
-          ),
-        );
-      }
-
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-
-      await AsyncStorage.setItem(IDS_KEY, JSON.stringify(ids));
-
-      Alert.alert(
-        "Xasuusinta waa la kaydiyay 💜",
-        `${ids.length} CaatoAI reminder ayaa la qorsheeyay.`,
-      );
-    } catch (error) {
-      console.log("Reminder scheduling error:", error);
-
-      Alert.alert(
-        "Waxbaa khaldamay",
-        error instanceof Error ? error.message : "Xasuusinta lama kaydin.",
-      );
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const turnEverythingOff = async () => {
-    await cancelCaatoReminders();
-
-    const updated: ReminderSettings = {
-      ...settings,
-      morningEnabled: false,
-      breakfastEnabled: false,
-      lunchEnabled: false,
-      dinnerEnabled: false,
-      waterEnabled: false,
-      stepsEnabled: false,
-      workoutEnabled: false,
-      weighInEnabled: false,
-    };
-
-    setSettings(updated);
-
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-
-    Alert.alert(
-      "Xasuusinta waa la damiyay",
-      "CaatoAI hadda wax reminder ah ma soo diri doono.",
-    );
-  };
-
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>
-          Xasuusinta waa la soo gelinayaa...
-        </Text>
-      </View>
-    );
-  }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backText}>‹ Dib u noqo</Text>
-        </Pressable>
+    <View style={styles.timePickerRow}>
+      <TextInput
+        value={display.time}
+        onChangeText={(text) => {
+          const converted = to24Hour(text, display.period);
 
-        <Text style={styles.title}>Xasuusinta CaatoAI 🔔</Text>
+          if (converted) {
+            onChange(converted);
+          }
+        }}
+        placeholder="8:00"
+        placeholderTextColor="#9CA3AF"
+        keyboardType="numbers-and-punctuation"
+        maxLength={5}
+        selectTextOnFocus
+        style={styles.timeInput}
+      />
 
-        <Text style={styles.subtitle}>
-          Dooro waxa CaatoAI kuu xasuusinayo iyo waqtiga aad rabto.
-        </Text>
+      <View style={styles.periodWrap}>
+        {(["AM", "PM"] as const).map((period) => (
+          <Pressable
+            key={period}
+            onPress={() => changePeriod(period)}
+            style={[
+              styles.periodButton,
 
-        <View style={styles.coachCard}>
-          <Text style={styles.coachEmoji}>💜</Text>
+              display.period === period && styles.periodButtonOn,
+            ]}
+          >
+            <Text
+              style={[
+                styles.periodText,
 
-          <View style={styles.coachTextArea}>
-            <Text style={styles.coachTitle}>CaatoAI Coach</Text>
-
-            <Text style={styles.coachText}>
-              Xasuusintu waxay ku taageeraysaa qorshahaaga. Ma isticmaali doono
-              cabsi, ceebayn, ama fariimo kugu dhiirrigeliya gaajo.
+                display.period === period && styles.periodTextOn,
+              ]}
+            >
+              {period}
             </Text>
-          </View>
-        </View>
-
-        <ReminderRow
-          icon="🌅"
-          title="Subax wanaagsan"
-          subtitle="Dhiirrigelin iyo hadafka maalinta"
-          enabled={settings.morningEnabled}
-          time={settings.morningTime}
-          onToggle={(value) => updateSetting("morningEnabled", value)}
-          onTimeChange={(value) => updateSetting("morningTime", value)}
-        />
-
-        <Text style={styles.sectionTitle}>Cuntada</Text>
-
-        {eatingStyle === "omad" && !isBreastfeeding ? (
-          <ReminderRow
-            icon="🍽️"
-            title="Cuntada OMAD"
-            subtitle="Xasuusin waqtiga cuntadaada OMAD"
-            enabled={settings.dinnerEnabled}
-            time={omadMealTime}
-            onToggle={(value) => updateSetting("dinnerEnabled", value)}
-            onTimeChange={() => {}}
-          />
-        ) : eatingStyle === "fasting" && !isBreastfeeding ? (
-          <>
-            <ReminderRow
-              icon="🕐"
-              title="Bilowga waqtiga cuntada"
-              subtitle="Waqtiga aad bilaabi karto cuntada"
-              enabled={settings.lunchEnabled}
-              time={fastingStartTime}
-              onToggle={(value) => updateSetting("lunchEnabled", value)}
-              onTimeChange={() => {}}
-            />
-
-            <ReminderRow
-              icon="🌙"
-              title="Dhammaadka waqtiga cuntada"
-              subtitle="Waqtiga eating window-kaagu dhammaanayo"
-              enabled={settings.dinnerEnabled}
-              time={fastingEndTime}
-              onToggle={(value) => updateSetting("dinnerEnabled", value)}
-              onTimeChange={() => {}}
-            />
-          </>
-        ) : (
-          <>
-            <ReminderRow
-              icon="🍳"
-              title="Quraac"
-              subtitle="Xasuusin quraac"
-              enabled={settings.breakfastEnabled}
-              time={settings.breakfastTime}
-              onToggle={(value) => updateSetting("breakfastEnabled", value)}
-              onTimeChange={(value) => updateSetting("breakfastTime", value)}
-            />
-
-            <ReminderRow
-              icon="🥗"
-              title="Qado"
-              subtitle="Xasuusin qado"
-              enabled={settings.lunchEnabled}
-              time={settings.lunchTime}
-              onToggle={(value) => updateSetting("lunchEnabled", value)}
-              onTimeChange={(value) => updateSetting("lunchTime", value)}
-            />
-
-            <ReminderRow
-              icon="🍽️"
-              title="Casho"
-              subtitle="Xasuusin casho"
-              enabled={settings.dinnerEnabled}
-              time={settings.dinnerTime}
-              onToggle={(value) => updateSetting("dinnerEnabled", value)}
-              onTimeChange={(value) => updateSetting("dinnerTime", value)}
-            />
-          </>
-        )}
-
-        <Text style={styles.sectionTitle}>Caadooyinka caafimaadka</Text>
-
-        <ReminderRow
-          icon="💧"
-          title="Biyaha"
-          subtitle="Xasuusin inaad biyo cabto"
-          enabled={settings.waterEnabled}
-          time={settings.waterTime}
-          onToggle={(value) => updateSetting("waterEnabled", value)}
-          onTimeChange={(value) => updateSetting("waterTime", value)}
-        />
-
-        <ReminderRow
-          icon="🚶"
-          title="Tallaabooyinka"
-          subtitle="Socod iyo dhaqdhaqaaq"
-          enabled={settings.stepsEnabled}
-          time={settings.stepsTime}
-          onToggle={(value) => updateSetting("stepsEnabled", value)}
-          onTimeChange={(value) => updateSetting("stepsTime", value)}
-        />
-
-        <ReminderRow
-          icon="💪"
-          title="Jimicsiga"
-          subtitle="Jimicsigaaga la qorsheeyay"
-          enabled={settings.workoutEnabled}
-          time={settings.workoutTime}
-          onToggle={(value) => updateSetting("workoutEnabled", value)}
-          onTimeChange={(value) => updateSetting("workoutTime", value)}
-        />
-
-        <View style={styles.weeklyCard}>
-          <View style={styles.weeklyHeader}>
-            <View style={styles.rowIcon}>
-              <Text style={styles.rowIconText}>⚖️</Text>
-            </View>
-
-            <View style={styles.rowTextArea}>
-              <Text style={styles.rowTitle}>Miisaanka toddobaadlaha</Text>
-
-              <Text style={styles.rowSubtitle}>Hal mar toddobaadkii</Text>
-            </View>
-
-            <Switch
-              value={settings.weighInEnabled}
-              onValueChange={(value) => updateSetting("weighInEnabled", value)}
-              trackColor={{
-                false: "#E5E7EB",
-                true: "#D8B4FE",
-              }}
-              thumbColor={settings.weighInEnabled ? "#7C3AED" : "#FFFFFF"}
-            />
-          </View>
-
-          {settings.weighInEnabled ? (
-            <>
-              <Text style={styles.smallLabel}>Maalinta</Text>
-
-              <View style={styles.daysWrap}>
-                {days.map((day) => (
-                  <Pressable
-                    key={day.value}
-                    onPress={() => updateSetting("weighInDay", day.value)}
-                    style={[
-                      styles.dayButton,
-                      settings.weighInDay === day.value &&
-                        styles.dayButtonSelected,
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.dayButtonText,
-                        settings.weighInDay === day.value &&
-                          styles.dayButtonTextSelected,
-                      ]}
-                    >
-                      {day.label}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-
-              <Text style={styles.smallLabel}>Waqtiga</Text>
-
-              <TextInput
-                value={settings.weighInTime}
-                onChangeText={(value) => updateSetting("weighInTime", value)}
-                placeholder="09:00"
-                placeholderTextColor="#A78BFA"
-                style={styles.weeklyTimeInput}
-                keyboardType="numbers-and-punctuation"
-                maxLength={5}
-              />
-            </>
-          ) : null}
-        </View>
-
-        <View style={styles.timeHelpCard}>
-          <Text style={styles.timeHelpTitle}>⏰ Sida waqtiga loo qoro</Text>
-
-          <Text style={styles.timeHelpText}>
-            Isticmaal 24-saac format. Tusaale: 08:00 = 8:00 AM, 13:00 = 1:00 PM,
-            18:30 = 6:30 PM.
-          </Text>
-        </View>
-
-        <Pressable
-          onPress={saveAndSchedule}
-          disabled={saving}
-          style={[styles.saveButton, saving && styles.saveButtonDisabled]}
-        >
-          <Text style={styles.saveButtonText}>
-            {saving ? "Waa la kaydinayaa..." : "Kaydi xasuusinta 🔔"}
-          </Text>
-        </Pressable>
-
-        <Pressable onPress={turnEverythingOff} style={styles.disableButton}>
-          <Text style={styles.disableButtonText}>Dami dhammaan xasuusinta</Text>
-        </Pressable>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          </Pressable>
+        ))}
+      </View>
+    </View>
   );
 }
 
-type ReminderRowProps = {
-  icon: string;
-  title: string;
-  subtitle: string;
-  enabled: boolean;
-  time: string;
-  onToggle: (value: boolean) => void;
-  onTimeChange: (value: string) => void;
-};
-
 function ReminderRow({
   icon,
-  title,
-  subtitle,
-  enabled,
-  time,
-  onToggle,
-  onTimeChange,
-}: ReminderRowProps) {
-  return (
-    <View style={styles.reminderCard}>
-      <View style={styles.reminderTop}>
-        <View style={styles.rowIcon}>
-          <Text style={styles.rowIconText}>{icon}</Text>
-        </View>
 
-        <View style={styles.rowTextArea}>
-          <Text style={styles.rowTitle}>{title}</Text>
+  title,
+
+  subtitle,
+
+  reminder,
+
+  onToggle,
+
+  onTime,
+}: {
+  icon: string;
+
+  title: string;
+
+  subtitle: string;
+
+  reminder: DailyReminder;
+
+  onToggle: (value: boolean) => void;
+
+  onTime: (value: string) => void;
+}) {
+  return (
+    <View style={styles.row}>
+      <View style={styles.rowTop}>
+        <View style={styles.rowText}>
+          <Text style={styles.rowTitle}>
+            {icon} {title}
+          </Text>
 
           <Text style={styles.rowSubtitle}>{subtitle}</Text>
         </View>
 
-        <Switch
-          value={enabled}
-          onValueChange={onToggle}
-          trackColor={{
-            false: "#E5E7EB",
-            true: "#D8B4FE",
-          }}
-          thumbColor={enabled ? "#7C3AED" : "#FFFFFF"}
-        />
+        <Switch value={reminder.enabled} onValueChange={onToggle} />
       </View>
 
-      {enabled ? (
-        <View style={styles.timeRow}>
+      {reminder.enabled ? (
+        <View style={styles.timeLine}>
           <Text style={styles.timeLabel}>Waqtiga</Text>
 
-          <TextInput
-            value={time}
-            onChangeText={onTimeChange}
-            placeholder="08:00"
-            placeholderTextColor="#A78BFA"
-            style={styles.timeInput}
-            keyboardType="numbers-and-punctuation"
-            maxLength={5}
-          />
+          <TimeField value={reminder.time} onChange={onTime} />
         </View>
       ) : null}
     </View>
   );
 }
 
+function WeeklyRow({
+  icon,
+
+  title,
+
+  subtitle,
+
+  reminder,
+
+  onToggle,
+
+  onTime,
+
+  onDay,
+}: {
+  icon: string;
+
+  title: string;
+
+  subtitle: string;
+
+  reminder: WeeklyReminder;
+
+  onToggle: (value: boolean) => void;
+
+  onTime: (value: string) => void;
+
+  onDay: (value: number) => void;
+}) {
+  return (
+    <View style={styles.row}>
+      <View style={styles.rowTop}>
+        <View style={styles.rowText}>
+          <Text style={styles.rowTitle}>
+            {icon} {title}
+          </Text>
+
+          <Text style={styles.rowSubtitle}>{subtitle}</Text>
+        </View>
+
+        <Switch value={reminder.enabled} onValueChange={onToggle} />
+      </View>
+
+      {reminder.enabled ? (
+        <>
+          <Text style={styles.dayLabel}>Maalinta</Text>
+
+          <View style={styles.dayWrap}>
+            {DAYS.map((day) => (
+              <Pressable
+                key={day.value}
+                onPress={() => onDay(day.value)}
+                style={[
+                  styles.dayButton,
+
+                  reminder.weekday === day.value && styles.dayButtonOn,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.dayButtonText,
+
+                    reminder.weekday === day.value && styles.dayButtonTextOn,
+                  ]}
+                >
+                  {day.label}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+
+          <View style={styles.timeLine}>
+            <Text style={styles.timeLabel}>Waqtiga</Text>
+
+            <TimeField value={reminder.time} onChange={onTime} />
+          </View>
+        </>
+      ) : null}
+    </View>
+  );
+}
+
+export default function RemindersScreen() {
+  const [settings, setSettings] = useState<ReminderSettings>(DEFAULTS);
+
+  const [loaded, setLoaded] = useState(false);
+
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const raw = await AsyncStorage.getItem(REMINDER_KEY);
+
+        if (raw) {
+          setSettings({ ...DEFAULTS, ...JSON.parse(raw) });
+        }
+      } catch (error) {
+        console.log("Reminder settings load error:", error);
+      } finally {
+        setLoaded(true);
+      }
+    })();
+  }, []);
+
+  const updateDaily = (
+    key:
+      | "water"
+      | "breakfast"
+      | "lunch"
+      | "dinner"
+      | "walking"
+      | "workout"
+      | "fasting"
+      | "lesson",
+    patch: Partial<DailyReminder>,
+  ) => {
+    setSettings((old) => ({
+      ...old,
+      [key]: { ...old[key], ...patch },
+    }));
+  };
+
+  const updateWeekly = (
+    key: "weighIn" | "weeklyPlan",
+
+    patch: Partial<WeeklyReminder>,
+  ) => {
+    setSettings((old) => ({
+      ...old,
+
+      [key]: { ...old[key], ...patch },
+    }));
+  };
+
+  const validate = () => {
+    const entries = [
+      settings.water,
+      settings.breakfast,
+      settings.lunch,
+      settings.dinner,
+      settings.walking,
+      settings.workout,
+      settings.fasting,
+      settings.lesson,
+      settings.weighIn,
+      settings.weeklyPlan,
+    ];
+
+    return entries.every((item) => !item.enabled || parseTime(item.time));
+  };
+
+  const save = async () => {
+    if (!validate()) {
+      Alert.alert(
+        "Waqti sax ah geli",
+
+        "Isticmaal waqtiga sida 8:00 AM ama 6:30 PM.",
+      );
+
+      return;
+    }
+
+    setSaving(true);
+
+    try {
+      await AsyncStorage.setItem(REMINDER_KEY, JSON.stringify(settings));
+
+      if (Platform.OS === "web") {
+        Alert.alert(
+          "Waa la kaydiyay",
+
+          "Doorashooyinka waa la kaydiyay. Ogeysiisyada dhabta ah waxaa lagu tijaabin doonaa iPhone ama Android.",
+        );
+
+        return;
+      }
+
+      const allowed = await requestNotificationPermission();
+
+      if (!allowed) {
+        Alert.alert(
+          "Ogeysiisyada lama oggolaan",
+
+          "Doorashooyinka waa la kaydiyay, laakiin telefoonku weli ma oggola ogeysiisyada.",
+        );
+
+        return;
+      }
+
+      // Only cancel CaatoAI reminder identifiers managed by this screen.
+
+      const ids = [
+        "caato-water",
+        "caato-breakfast",
+        "caato-lunch",
+        "caato-dinner",
+        "caato-walking",
+        "caato-workout",
+        "caato-fasting",
+        "caato-lesson",
+        "caato-weigh-in",
+        "caato-weekly-plan",
+      ];
+
+      await Promise.all(
+        ids.map((id) =>
+          Notifications.cancelScheduledNotificationAsync(id).catch(() => {}),
+        ),
+      );
+
+      if (settings.water.enabled) {
+        await scheduleDaily(
+          "caato-water",
+
+          "💧 Waqtiga biyaha",
+
+          "Cab biyo oo ku dar koobkaaga CaatoAI.",
+
+          settings.water.time,
+        );
+      }
+
+      if (settings.breakfast.enabled) {
+        await scheduleDaily(
+          "caato-breakfast",
+
+          "🌅 Quraac",
+
+          "Waa waqtigii qorshaha quraacda maanta.",
+
+          settings.breakfast.time,
+        );
+      }
+
+      if (settings.lunch.enabled) {
+        await scheduleDaily(
+          "caato-lunch",
+
+          "☀️ Qado",
+
+          "Eeg qorshaha qadada maanta ee CaatoAI.",
+
+          settings.lunch.time,
+        );
+      }
+
+      if (settings.dinner.enabled) {
+        await scheduleDaily(
+          "caato-dinner",
+
+          "🌙 Casho",
+
+          "Waa waqtigii qorshaha cashada maanta.",
+
+          settings.dinner.time,
+        );
+      }
+
+      if (settings.walking.enabled) {
+        await scheduleDaily(
+          "caato-walking",
+
+          "🚶 Dhaqdhaqaaq",
+
+          "Waqti yar oo socod ama dhaqdhaqaaq ah samee haddii ay kuu habboon tahay.",
+
+          settings.walking.time,
+        );
+      }
+
+      if (settings.workout.enabled) {
+        await scheduleDaily(
+          "caato-workout",
+          "🏃 Jimicsiga maanta",
+          "Waa waqtigii jimicsigaaga CaatoAI. Samee waxa maanta kuu qorshaysan.",
+          settings.workout.time,
+        );
+      }
+
+      if (settings.fasting.enabled) {
+        await scheduleDaily(
+          "caato-fasting",
+          "⏱️ Soonka",
+          "Waa waqtigii aad eegi lahayd qorshaha soonkaaga CaatoAI.",
+          settings.fasting.time,
+        );
+      }
+
+      if (settings.lesson.enabled) {
+        await scheduleDaily(
+          "caato-lesson",
+          "📖 Casharka maanta",
+          "Qaado dhowr daqiiqo oo baro casharkaaga maanta.",
+          settings.lesson.time,
+        );
+      }
+
+      if (settings.workout.enabled) {
+        await scheduleDaily(
+          "caato-workout",
+          "🏃 Jimicsiga maanta",
+          "Waa waqtigii jimicsigaaga CaatoAI. Samee jimicsiga maanta kuu qorshaysan.",
+          settings.workout.time,
+        );
+      }
+
+      if (settings.fasting.enabled) {
+        await scheduleDaily(
+          "caato-fasting",
+          "⏱️ Soonka",
+          "Waa waqtigii aad eegi lahayd qorshaha soonkaaga CaatoAI.",
+          settings.fasting.time,
+        );
+      }
+
+      if (settings.lesson.enabled) {
+        await scheduleDaily(
+          "caato-lesson",
+          "📖 Casharka maanta",
+          "Qaado dhowr daqiiqo oo baro casharkaaga maanta.",
+          settings.lesson.time,
+        );
+      }
+
+      if (settings.weighIn.enabled) {
+        await scheduleWeekly(
+          "caato-weigh-in",
+
+          "⚖️ Miisaanka toddobaadka",
+
+          "Haddii aad rabto, geli miisaankaaga toddobaadkan.",
+
+          settings.weighIn.time,
+
+          settings.weighIn.weekday,
+        );
+      }
+
+      if (settings.weeklyPlan.enabled) {
+        await scheduleWeekly(
+          "caato-weekly-plan",
+
+          "📅 Qorshaha toddobaadka",
+
+          "Eeg cuntooyinka iyo qorshaha CaatoAI ee toddobaadka cusub.",
+
+          settings.weeklyPlan.time,
+
+          settings.weeklyPlan.weekday,
+        );
+      }
+
+      Alert.alert("✓ Waa la kaydiyay", "Xasuusiyeyaashaada waa la diyaariyay.");
+    } catch (error) {
+      console.log("Reminder save error:", error);
+
+      Alert.alert(
+        "Waxbaa qaldamay",
+
+        "Doorashooyinka waa la kaydiyay, laakiin ogeysiisyada lama diyaarin karin.",
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (!loaded) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.loading}>
+          Xasuusiyeyaasha waa la soo furayaa...
+        </Text>
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      showsVerticalScrollIndicator={false}
+    >
+      <Text style={styles.eyebrow}>CAATOAI • XASUUSIYEYAASHA</Text>
+
+      <Text style={styles.title}>Xasuusiyeyaasha 🔔</Text>
+
+      <Text style={styles.subtitle}>
+        Dooro waxa aad rabto in CaatoAI ku xasuusiyo. Dooro waqtiga iyo AM ama
+        PM, tusaale 8:00 AM ama 6:30 PM.
+      </Text>
+
+      {Platform.OS === "web" ? (
+        <View style={styles.webNotice}>
+          <Text style={styles.webNoticeText}>
+            💻 Browser-ka: settings-ka waa la kaydin karaa. Ogeysiisyada
+            telefoonka waxaa lagu tijaabin doonaa iPhone ama Android.
+          </Text>
+        </View>
+      ) : null}
+
+      <ReminderRow
+        icon="💧"
+        title="Biyaha"
+        subtitle="Xasuusin maalinle ah oo biyaha ah."
+        reminder={settings.water}
+        onToggle={(enabled) => updateDaily("water", { enabled })}
+        onTime={(time) => updateDaily("water", { time })}
+      />
+
+      <ReminderRow
+        icon="🌅"
+        title="Quraac"
+        subtitle="Xasuusi qorshaha quraacda."
+        reminder={settings.breakfast}
+        onToggle={(enabled) => updateDaily("breakfast", { enabled })}
+        onTime={(time) => updateDaily("breakfast", { time })}
+      />
+
+      <ReminderRow
+        icon="☀️"
+        title="Qado"
+        subtitle="Xasuusi qorshaha qadada."
+        reminder={settings.lunch}
+        onToggle={(enabled) => updateDaily("lunch", { enabled })}
+        onTime={(time) => updateDaily("lunch", { time })}
+      />
+
+      <ReminderRow
+        icon="🌙"
+        title="Casho"
+        subtitle="Xasuusi qorshaha cashada."
+        reminder={settings.dinner}
+        onToggle={(enabled) => updateDaily("dinner", { enabled })}
+        onTime={(time) => updateDaily("dinner", { time })}
+      />
+
+      <ReminderRow
+        icon="🚶"
+        title="Dhaqdhaqaaq"
+        subtitle="Xasuusin socod ama dhaqdhaqaaq maalinle ah."
+        reminder={settings.walking}
+        onToggle={(enabled) => updateDaily("walking", { enabled })}
+        onTime={(time) => updateDaily("walking", { time })}
+      />
+      <ReminderRow
+        icon="🏃"
+        title="Jimicsiga"
+        subtitle="Xasuusi jimicsigaaga maalinlaha ah."
+        reminder={settings.workout}
+        onToggle={(enabled) => updateDaily("workout", { enabled })}
+        onTime={(time) => updateDaily("workout", { time })}
+      />
+
+      <ReminderRow
+        icon="⏱️"
+        title="Soonka"
+        subtitle="Xasuusi waqtiga qorshaha soonkaaga."
+        reminder={settings.fasting}
+        onToggle={(enabled) => updateDaily("fasting", { enabled })}
+        onTime={(time) => updateDaily("fasting", { time })}
+      />
+
+      <ReminderRow
+        icon="📖"
+        title="Casharka maanta"
+        subtitle="Xasuusi casharkaaga gaaban ee maalinlaha ah."
+        reminder={settings.lesson}
+        onToggle={(enabled) => updateDaily("lesson", { enabled })}
+        onTime={(time) => updateDaily("lesson", { time })}
+      />
+      <WeeklyRow
+        icon="⚖️"
+        title="Miisaanka toddobaadka"
+        subtitle="Dooro maalinta iyo waqtiga miisaanka."
+        reminder={settings.weighIn}
+        onToggle={(enabled) => updateWeekly("weighIn", { enabled })}
+        onTime={(time) => updateWeekly("weighIn", { time })}
+        onDay={(weekday) => updateWeekly("weighIn", { weekday })}
+      />
+
+      <WeeklyRow
+        icon="📅"
+        title="Qorshaha toddobaadka"
+        subtitle="Xasuusi inaad eegto ama beddesho qorshaha toddobaadka."
+        reminder={settings.weeklyPlan}
+        onToggle={(enabled) => updateWeekly("weeklyPlan", { enabled })}
+        onTime={(time) => updateWeekly("weeklyPlan", { time })}
+        onDay={(weekday) => updateWeekly("weeklyPlan", { weekday })}
+      />
+
+      <Pressable
+        disabled={saving}
+        onPress={save}
+        style={[styles.saveButton, saving && styles.saveButtonDisabled]}
+      >
+        <Text style={styles.saveText}>
+          {saving ? "Waa la kaydinayaa..." : "🔔 Kaydi xasuusiyeyaasha"}
+        </Text>
+      </Pressable>
+
+      <Text style={styles.note}>
+        Waxaad mar kasta dib uga beddeli kartaa xasuusiyeyaashan.
+      </Text>
+    </ScrollView>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF7FC",
+
+    backgroundColor: "#FFFBF5",
   },
 
-  loadingContainer: {
+  center: {
     flex: 1,
-    backgroundColor: "#FFF7FC",
-    justifyContent: "center",
+
     alignItems: "center",
+
+    justifyContent: "center",
+
+    backgroundColor: "#FFFBF5",
   },
 
-  loadingText: {
-    color: "#7C3AED",
+  loading: {
+    color: "#166534",
+
     fontWeight: "800",
   },
 
   content: {
-    flexGrow: 1,
-    paddingHorizontal: 22,
-    paddingTop: 22,
-    paddingBottom: 50,
-    maxWidth: 650,
     width: "100%",
+
+    maxWidth: 680,
+
     alignSelf: "center",
+
+    paddingHorizontal: 22,
+
+    paddingTop: 22,
+
+    paddingBottom: 60,
   },
 
-  backButton: {
+  back: {
     alignSelf: "flex-start",
+
     paddingVertical: 8,
+
     paddingRight: 20,
-    marginBottom: 8,
+
+    marginBottom: 12,
   },
 
   backText: {
-    color: "#7C3AED",
     fontSize: 16,
-    fontWeight: "700",
+
+    fontWeight: "800",
+
+    color: "#166534",
+  },
+
+  eyebrow: {
+    fontSize: 11,
+
+    fontWeight: "900",
+
+    letterSpacing: 1.1,
+
+    color: "#15803D",
+
+    marginBottom: 7,
   },
 
   title: {
-    color: "#6D28D9",
-    fontSize: 27,
+    fontSize: 30,
+
     fontWeight: "900",
-    marginBottom: 6,
+
+    color: "#1F2937",
   },
 
   subtitle: {
+    fontSize: 14,
+
+    lineHeight: 21,
+
     color: "#6B7280",
-    fontSize: 15,
-    lineHeight: 22,
-    marginBottom: 20,
+
+    marginTop: 7,
+
+    marginBottom: 16,
   },
 
-  coachCard: {
-    backgroundColor: "#F3E8FF",
+  webNotice: {
+    backgroundColor: "#EFF6FF",
+
     borderWidth: 1,
-    borderColor: "#D8B4FE",
-    borderRadius: 20,
-    padding: 16,
-    flexDirection: "row",
-    marginBottom: 20,
+
+    borderColor: "#BFDBFE",
+
+    borderRadius: 16,
+
+    padding: 14,
+
+    marginBottom: 14,
   },
 
-  coachEmoji: {
-    fontSize: 27,
-    marginRight: 12,
-  },
+  webNoticeText: {
+    fontSize: 12,
 
-  coachTextArea: {
-    flex: 1,
-  },
-
-  coachTitle: {
-    color: "#6D28D9",
-    fontSize: 16,
-    fontWeight: "900",
-    marginBottom: 4,
-  },
-
-  coachText: {
-    color: "#6B7280",
-    fontSize: 13,
     lineHeight: 19,
+
+    color: "#1E3A8A",
+
+    fontWeight: "700",
   },
 
-  sectionTitle: {
-    color: "#3B0764",
-    fontSize: 17,
-    fontWeight: "900",
-    marginTop: 8,
-    marginBottom: 10,
-  },
-
-  reminderCard: {
+  row: {
     backgroundColor: "#FFFFFF",
+
     borderWidth: 1,
-    borderColor: "#E9D5FF",
-    borderRadius: 18,
-    padding: 15,
-    marginBottom: 10,
+
+    borderColor: "#E7E5E4",
+
+    borderRadius: 20,
+
+    padding: 17,
+
+    marginBottom: 12,
   },
 
-  reminderTop: {
+  rowTop: {
     flexDirection: "row",
+
     alignItems: "center",
+
+    justifyContent: "space-between",
+
+    gap: 12,
   },
 
-  rowIcon: {
-    width: 43,
-    height: 43,
-    borderRadius: 14,
-    backgroundColor: "#FFF1F7",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 11,
-  },
-
-  rowIconText: {
-    fontSize: 21,
-  },
-
-  rowTextArea: {
+  rowText: {
     flex: 1,
   },
 
   rowTitle: {
-    color: "#3B0764",
-    fontSize: 15,
+    fontSize: 16,
+
     fontWeight: "900",
+
+    color: "#1F2937",
   },
 
   rowSubtitle: {
-    color: "#6B7280",
     fontSize: 12,
-    marginTop: 2,
+
+    lineHeight: 18,
+
+    color: "#6B7280",
+
+    marginTop: 4,
   },
 
-  timeRow: {
+  timeLine: {
     flexDirection: "row",
-    justifyContent: "space-between",
+
     alignItems: "center",
+
+    justifyContent: "space-between",
+
     marginTop: 14,
+
     paddingTop: 12,
+
     borderTopWidth: 1,
-    borderTopColor: "#F3E8FF",
+
+    borderTopColor: "#F3F4F6",
   },
 
   timeLabel: {
-    color: "#7C3AED",
     fontSize: 13,
+
     fontWeight: "800",
+
+    color: "#4B5563",
+  },
+
+  timePickerRow: {
+    flexDirection: "row",
+
+    alignItems: "center",
+
+    gap: 8,
+  },
+
+  periodWrap: {
+    flexDirection: "row",
+
+    borderWidth: 1,
+
+    borderColor: "#D1D5DB",
+
+    borderRadius: 12,
+
+    overflow: "hidden",
+  },
+
+  periodButton: {
+    minHeight: 42,
+
+    minWidth: 46,
+
+    alignItems: "center",
+
+    justifyContent: "center",
+
+    backgroundColor: "#FFFFFF",
+  },
+
+  periodButtonOn: {
+    backgroundColor: "#DCFCE7",
+  },
+
+  periodText: {
+    fontSize: 12,
+
+    fontWeight: "900",
+
+    color: "#6B7280",
+  },
+
+  periodTextOn: {
+    color: "#166534",
   },
 
   timeInput: {
-    width: 90,
-    backgroundColor: "#FFF7FC",
+    width: 88,
+
+    minHeight: 42,
+
     borderWidth: 1,
-    borderColor: "#D8B4FE",
+
+    borderColor: "#D1D5DB",
+
     borderRadius: 12,
-    paddingVertical: 9,
-    paddingHorizontal: 12,
-    color: "#3B0764",
-    fontSize: 15,
-    fontWeight: "800",
+
+    backgroundColor: "#FAFAF9",
+
     textAlign: "center",
-  },
 
-  weeklyCard: {
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E9D5FF",
-    borderRadius: 18,
-    padding: 15,
-    marginTop: 4,
-    marginBottom: 12,
-  },
+    fontSize: 15,
 
-  weeklyHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 14,
-  },
-
-  smallLabel: {
-    color: "#7C3AED",
-    fontSize: 13,
     fontWeight: "800",
-    marginTop: 8,
+
+    color: "#1F2937",
+
+    paddingHorizontal: 8,
+  },
+
+  dayLabel: {
+    fontSize: 12,
+
+    fontWeight: "800",
+
+    color: "#4B5563",
+
+    marginTop: 14,
+
     marginBottom: 8,
   },
 
-  daysWrap: {
+  dayWrap: {
     flexDirection: "row",
+
     flexWrap: "wrap",
+
     gap: 7,
-    marginBottom: 8,
   },
 
   dayButton: {
-    backgroundColor: "#FFF7FC",
     borderWidth: 1,
-    borderColor: "#E9D5FF",
+
+    borderColor: "#D1D5DB",
+
+    borderRadius: 999,
+
     paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 11,
+
+    paddingVertical: 7,
+
+    backgroundColor: "#FFFFFF",
   },
 
-  dayButtonSelected: {
-    backgroundColor: "#7C3AED",
-    borderColor: "#7C3AED",
+  dayButtonOn: {
+    borderColor: "#16A34A",
+
+    backgroundColor: "#DCFCE7",
   },
 
   dayButtonText: {
-    color: "#7C3AED",
-    fontSize: 12,
+    fontSize: 11,
+
     fontWeight: "800",
-  },
 
-  dayButtonTextSelected: {
-    color: "#FFFFFF",
-  },
-
-  weeklyTimeInput: {
-    width: 105,
-    backgroundColor: "#FFF7FC",
-    borderWidth: 1,
-    borderColor: "#D8B4FE",
-    borderRadius: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    color: "#3B0764",
-    fontSize: 15,
-    fontWeight: "800",
-    textAlign: "center",
-  },
-
-  timeHelpCard: {
-    backgroundColor: "#FFF1F7",
-    borderRadius: 16,
-    padding: 14,
-    marginVertical: 14,
-  },
-
-  timeHelpTitle: {
-    color: "#BE185D",
-    fontSize: 14,
-    fontWeight: "900",
-    marginBottom: 5,
-  },
-
-  timeHelpText: {
     color: "#6B7280",
-    fontSize: 13,
-    lineHeight: 19,
+  },
+
+  dayButtonTextOn: {
+    color: "#166534",
   },
 
   saveButton: {
-    backgroundColor: "#EC4899",
-    borderRadius: 18,
-    paddingVertical: 17,
+    minHeight: 54,
+
+    borderRadius: 16,
+
+    backgroundColor: "#166534",
+
     alignItems: "center",
-    marginTop: 4,
+
+    justifyContent: "center",
+
+    paddingHorizontal: 18,
+
+    marginTop: 10,
   },
 
   saveButtonDisabled: {
     opacity: 0.6,
   },
 
-  saveButtonText: {
+  saveText: {
     color: "#FFFFFF",
-    fontSize: 16,
+
+    fontSize: 14,
+
     fontWeight: "900",
   },
 
-  disableButton: {
-    paddingVertical: 16,
-    alignItems: "center",
-    marginTop: 8,
-  },
+  note: {
+    textAlign: "center",
 
-  disableButtonText: {
-    color: "#9CA3AF",
-    fontSize: 14,
-    fontWeight: "800",
+    fontSize: 11,
+
+    lineHeight: 17,
+
+    color: "#78716C",
+
+    marginTop: 12,
   },
 });

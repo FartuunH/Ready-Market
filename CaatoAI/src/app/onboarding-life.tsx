@@ -73,6 +73,7 @@ export default function OnboardingLifeScreen() {
 
     if (confidence === "1" || confidence === "2") {
       return {
+        emoji: "🌱",
         title: "Uma baahnid kalsooni buuxda maanta.",
         text: "Waxaan ku bilaabaynaa tallaabooyin yar-yar oo fudud. CaatoAI wuxuu kaa caawin doonaa inaad kalsoonidaada si tartiib ah u dhisto.",
       };
@@ -80,12 +81,14 @@ export default function OnboardingLifeScreen() {
 
     if (confidence === "3") {
       return {
+        emoji: "💚",
         title: "Taasi waa meel fiican oo laga bilaabo.",
         text: "Uma baahnid inaad wax walba si qumman u samayso. Waxaan diiradda saari doonaa joogteynta iyo horumar yar oo maalinle ah.",
       };
     }
 
     return {
+      emoji: "✨",
       title: "Waa bilow fiican.",
       text: "Waxaan kaa caawin doonaa inaad kalsoonidaas u beddesho caadooyin joogto ah oo noloshaada ku shaqeeya.",
     };
@@ -94,49 +97,79 @@ export default function OnboardingLifeScreen() {
   const coachResponse = getCoachResponse();
 
   return (
-    <View style={styles.screen}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.content}>
-          <View style={styles.progressTrack}>
-            <View style={styles.progressFill} />
-          </View>
+    <ScrollView
+      style={styles.screen}
+      contentContainerStyle={styles.scrollContent}
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={styles.container}>
+        {/* TOP */}
 
-          <View style={styles.coachRow}>
-            <View style={styles.coachIcon}>
-              <Text style={styles.coachEmoji}>🌿</Text>
+        <View style={styles.topRow}>
+          <Pressable
+            onPress={() => router.back()}
+            style={({ pressed }) => [
+              styles.backButton,
+              pressed && styles.pressed,
+            ]}
+          >
+            <Text style={styles.backArrow}>‹</Text>
+          </Pressable>
+
+          <View style={styles.progressArea}>
+            <View style={styles.progressTrack}>
+              <View style={styles.progressFill} />
             </View>
 
-            <View style={styles.coachTextArea}>
-              <Text style={styles.coachName}>CaatoAI</Text>
-              <Text style={styles.coachLabel}>
-                Waxaan rabaa inaan ogaado sida aad hadda dareemayso
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.questionArea}>
-            <Text style={styles.smallGreeting}>
-              {name ? `${name}, ` : ""}jawaab sax ama khalad ma jirto 💚
-            </Text>
-
-            <Text style={styles.title}>
-              Intee ayaad ku kalsoon tahay{"\n"}
-              <Text style={styles.titleHighlight}>
-                inaad markan sii wadi karto?
-              </Text>
-            </Text>
-
-            <Text style={styles.subtitle}>
-              Tani ma aha imtixaan. Waxaan rabnaa inaan ogaanno inta taageero ee
-              CaatoAI kuu baahan yahay inuu ku siiyo bilowga safarkaaga.
+            <Text style={styles.progressText}>
+              Waxaan kuu dhisaynaa qorshe kuu gaar ah
             </Text>
           </View>
+        </View>
 
+        {/* COACH */}
+
+        <View style={styles.coachRow}>
+          <View style={styles.coachIcon}>
+            <Text style={styles.coachEmoji}>🌿</Text>
+          </View>
+
+          <View style={styles.coachTextArea}>
+            <Text style={styles.coachName}>CaatoAI</Text>
+
+            <Text style={styles.coachLabel}>
+              Aan fahanno sida aad hadda dareemayso
+            </Text>
+          </View>
+        </View>
+
+        {/* HERO */}
+
+        <View style={styles.hero}>
+          <View style={styles.stepBadge}>
+            <Text style={styles.stepBadgeText}>DIYAAR GAROWGAAGA</Text>
+          </View>
+
+          <Text style={styles.title}>
+            {name ? `${name}, ` : ""}
+            intee ayaad ku{"\n"}
+            <Text style={styles.titleGreen}>
+              kalsoon tahay inaad sii wadi karto?
+            </Text>
+          </Text>
+
+          <Text style={styles.subtitle}>
+            Tani ma aha imtixaan. Waxaan rabnaa inaan fahanno inta taageero ee
+            aad u baahan karto marka aad bilaabayso safarkaaga.
+          </Text>
+        </View>
+
+        {/* SCALE */}
+
+        <View style={styles.scaleCard}>
           <View style={styles.scaleLabels}>
             <Text style={styles.scaleLabel}>Kalsooni yar</Text>
+
             <Text style={styles.scaleLabel}>Kalsooni badan</Text>
           </View>
 
@@ -167,40 +200,95 @@ export default function OnboardingLifeScreen() {
             })}
           </View>
 
-          {selectedConfidence && (
-            <View style={styles.selectionCard}>
-              <View style={styles.selectionTop}>
-                <View style={styles.selectionNumber}>
-                  <Text style={styles.selectionNumberText}>
-                    {selectedConfidence.number}
-                  </Text>
-                </View>
+          <View style={styles.scaleFooter}>
+            <Text style={styles.scaleFooterText}>1</Text>
 
-                <View style={styles.selectionTextArea}>
-                  <Text style={styles.selectionTitle}>
-                    {selectedConfidence.title}
-                  </Text>
+            <View style={styles.scaleLine} />
 
-                  <Text style={styles.selectionDescription}>
-                    {selectedConfidence.description}
-                  </Text>
-                </View>
-              </View>
+            <Text style={styles.scaleFooterText}>5</Text>
+          </View>
+        </View>
+
+        {/* SELECTED ANSWER */}
+
+        {selectedConfidence && (
+          <View style={styles.selectionCard}>
+            <View style={styles.selectionNumber}>
+              <Text style={styles.selectionNumberText}>
+                {selectedConfidence.number}
+              </Text>
             </View>
-          )}
 
-          {coachResponse && (
-            <View style={styles.responseCard}>
-              <Text style={styles.responseEmoji}>💚</Text>
+            <View style={styles.selectionTextArea}>
+              <Text style={styles.selectionLabel}>JAWAABTAADA</Text>
 
-              <View style={styles.responseTextArea}>
-                <Text style={styles.responseTitle}>{coachResponse.title}</Text>
+              <Text style={styles.selectionTitle}>
+                {selectedConfidence.title}
+              </Text>
 
-                <Text style={styles.responseText}>{coachResponse.text}</Text>
-              </View>
+              <Text style={styles.selectionDescription}>
+                {selectedConfidence.description}
+              </Text>
             </View>
-          )}
+          </View>
+        )}
 
+        {/* AI RESPONSE */}
+
+        {coachResponse && (
+          <View style={styles.responseCard}>
+            <View style={styles.responseIcon}>
+              <Text style={styles.responseEmoji}>{coachResponse.emoji}</Text>
+            </View>
+
+            <View style={styles.responseTextArea}>
+              <Text style={styles.responseLabel}>CAATOAI</Text>
+
+              <Text style={styles.responseTitle}>{coachResponse.title}</Text>
+
+              <Text style={styles.responseText}>{coachResponse.text}</Text>
+            </View>
+          </View>
+        )}
+
+        {/* NO PERFECTION */}
+
+        <View style={styles.lessonCard}>
+          <View style={styles.lessonIcon}>
+            <Text style={styles.lessonEmoji}>🧠</Text>
+          </View>
+
+          <View style={styles.lessonTextArea}>
+            <Text style={styles.lessonTitle}>
+              Kalsoonidu ma aha waxa ugu muhiimsan
+            </Text>
+
+            <Text style={styles.lessonText}>
+              Dad badan waxay bilaabaan iyagoo aan hubin inay sii wadi karaan.
+              Waxa muhiimka ahi waa inaan helno tallaabada yar ee maanta kuu
+              shaqaynaysa.
+            </Text>
+          </View>
+        </View>
+
+        {/* HABIT MESSAGE */}
+
+        <View style={styles.habitCard}>
+          <Text style={styles.habitEmoji}>🌿</Text>
+
+          <View style={styles.habitTextArea}>
+            <Text style={styles.habitTitle}>Ma raadinayno perfection</Text>
+
+            <Text style={styles.habitText}>
+              Hal maalin oo adag ma burburinayso safarkaaga. CaatoAI wuxuu kaa
+              caawin doonaa inaad dib u bilowdo oo aad sii waddo.
+            </Text>
+          </View>
+        </View>
+
+        {/* BUTTON */}
+
+        <View style={styles.bottomArea}>
           <Pressable
             disabled={!confidence}
             onPress={continueNext}
@@ -211,164 +299,221 @@ export default function OnboardingLifeScreen() {
             ]}
           >
             <Text style={styles.buttonText}>Sii wad</Text>
+
             <Text style={styles.buttonArrow}>→</Text>
           </Pressable>
+
+          <Text style={styles.bottomText}>
+            💚 Jawaabtaadu waxay naga caawinaysaa inaan taageerada CaatoAI kuu
+            waafajino.
+          </Text>
         </View>
-      </ScrollView>
-    </View>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#FFFBF5",
+    backgroundColor: "#FBF8F1",
   },
 
   scrollContent: {
     flexGrow: 1,
-    paddingVertical: 20,
+    paddingVertical: 18,
   },
 
-  content: {
+  container: {
+    flexGrow: 1,
     width: "100%",
-    maxWidth: 540,
+    maxWidth: 560,
     alignSelf: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 22,
   },
 
-  progressTrack: {
-    width: "100%",
-    height: 5,
-    borderRadius: 999,
-    backgroundColor: "#E5E7EB",
-    overflow: "hidden",
-    marginBottom: 26,
-  },
-
-  progressFill: {
-    width: "36%",
-    height: "100%",
-    borderRadius: 999,
-    backgroundColor: "#16A34A",
-  },
-
-  coachRow: {
+  topRow: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 25,
   },
 
-  coachIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 15,
-    backgroundColor: "#DCFCE7",
+  backButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#BBF7D0",
+    borderColor: "#E2E8E2",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 13,
+  },
+
+  backArrow: {
+    color: "#173F2A",
+    fontSize: 30,
+    lineHeight: 31,
+    fontWeight: "500",
+    marginTop: -2,
+  },
+
+  pressed: {
+    opacity: 0.75,
+  },
+
+  progressArea: {
+    flex: 1,
+  },
+
+  progressTrack: {
+    height: 5,
+    backgroundColor: "#E2E7E2",
+    borderRadius: 999,
+    overflow: "hidden",
+  },
+
+  progressFill: {
+    width: "56%",
+    height: "100%",
+    backgroundColor: "#4F7C5B",
+    borderRadius: 999,
+  },
+
+  progressText: {
+    color: "#8A938C",
+    fontSize: 9,
+    fontWeight: "700",
+    marginTop: 6,
+  },
+
+  coachRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 24,
+  },
+
+  coachIcon: {
+    width: 46,
+    height: 46,
+    borderRadius: 15,
+    backgroundColor: "#E3F1E5",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 11,
-    flexShrink: 0,
   },
 
   coachEmoji: {
-    fontSize: 21,
+    fontSize: 22,
   },
 
   coachTextArea: {
     flex: 1,
-    minWidth: 0,
   },
 
   coachName: {
-    color: "#14532D",
+    color: "#173F2A",
     fontSize: 15,
     fontWeight: "900",
   },
 
   coachLabel: {
-    color: "#6B7280",
-    fontSize: 11,
-    lineHeight: 16,
+    color: "#7B857E",
+    fontSize: 10,
+    lineHeight: 15,
     fontWeight: "600",
     marginTop: 2,
   },
 
-  questionArea: {
-    marginBottom: 24,
+  hero: {
+    marginBottom: 20,
   },
 
-  smallGreeting: {
-    color: "#15803D",
-    fontSize: 13,
-    fontWeight: "800",
-    marginBottom: 8,
+  stepBadge: {
+    alignSelf: "flex-start",
+    backgroundColor: "#EAF4EA",
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginBottom: 12,
+  },
+
+  stepBadgeText: {
+    color: "#477253",
+    fontSize: 9,
+    fontWeight: "900",
+    letterSpacing: 0.9,
   },
 
   title: {
-    color: "#1F2937",
+    color: "#202923",
     fontSize: 30,
     lineHeight: 37,
     fontWeight: "900",
+    letterSpacing: -0.6,
     marginBottom: 11,
   },
 
-  titleHighlight: {
-    color: "#14532D",
+  titleGreen: {
+    color: "#28623B",
   },
 
   subtitle: {
-    color: "#6B7280",
+    color: "#68736B",
     fontSize: 14,
     lineHeight: 21,
+  },
+
+  scaleCard: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E0E6E0",
+    borderRadius: 22,
+    padding: 16,
+    marginBottom: 12,
   },
 
   scaleLabels: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 9,
-    paddingHorizontal: 2,
+    marginBottom: 11,
   },
 
   scaleLabel: {
-    color: "#9CA3AF",
-    fontSize: 10,
-    fontWeight: "700",
+    color: "#8A938C",
+    fontSize: 9,
+    fontWeight: "800",
   },
 
   numberRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 8,
-    marginBottom: 18,
+    gap: 7,
   },
 
   numberButton: {
     flex: 1,
-    aspectRatio: 1,
-    maxHeight: 62,
-    borderRadius: 18,
-    backgroundColor: "#FFFFFF",
+    height: 54,
+    borderRadius: 16,
+    backgroundColor: "#F5F7F4",
     borderWidth: 1,
-    borderColor: "#DDE8DE",
+    borderColor: "#DFE5DF",
     alignItems: "center",
     justifyContent: "center",
   },
 
   numberButtonSelected: {
-    backgroundColor: "#14532D",
-    borderColor: "#14532D",
+    backgroundColor: "#28623B",
+    borderColor: "#28623B",
   },
 
   numberButtonPressed: {
-    opacity: 0.88,
+    opacity: 0.86,
     transform: [{ scale: 0.97 }],
   },
 
   numberText: {
-    color: "#14532D",
-    fontSize: 21,
+    color: "#4F6957",
+    fontSize: 18,
     fontWeight: "900",
   },
 
@@ -376,128 +521,242 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 
+  scaleFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 10,
+    paddingHorizontal: 5,
+  },
+
+  scaleFooterText: {
+    color: "#A1A8A2",
+    fontSize: 8,
+    fontWeight: "800",
+  },
+
+  scaleLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#E6EAE6",
+    marginHorizontal: 8,
+  },
+
   selectionCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#F1F7F0",
     borderWidth: 1,
-    borderColor: "#DDE8DE",
-    borderRadius: 18,
+    borderColor: "#D7E7D8",
+    borderRadius: 19,
     padding: 14,
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 12,
   },
 
-  selectionTop: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
   selectionNumber: {
-    width: 40,
-    height: 40,
-    borderRadius: 13,
-    backgroundColor: "#DCFCE7",
+    width: 45,
+    height: 45,
+    borderRadius: 14,
+    backgroundColor: "#DCEBDD",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 11,
-    flexShrink: 0,
   },
 
   selectionNumberText: {
-    color: "#14532D",
-    fontSize: 17,
+    color: "#28563A",
+    fontSize: 18,
     fontWeight: "900",
   },
 
   selectionTextArea: {
     flex: 1,
-    minWidth: 0,
+  },
+
+  selectionLabel: {
+    color: "#6F8C75",
+    fontSize: 8,
+    fontWeight: "900",
+    letterSpacing: 0.8,
+    marginBottom: 2,
   },
 
   selectionTitle: {
-    color: "#14532D",
-    fontSize: 14,
+    color: "#28563A",
+    fontSize: 13,
     fontWeight: "900",
     marginBottom: 3,
   },
 
   selectionDescription: {
-    color: "#6B7280",
-    fontSize: 11,
-    lineHeight: 16,
+    color: "#718077",
+    fontSize: 10,
+    lineHeight: 15,
   },
 
   responseCard: {
-    backgroundColor: "#F0FDF4",
-    borderWidth: 1,
-    borderColor: "#BBF7D0",
-    borderRadius: 18,
-    padding: 14,
+    backgroundColor: "#173F2A",
+    borderRadius: 21,
+    padding: 15,
     flexDirection: "row",
-    marginBottom: 18,
+    alignItems: "flex-start",
+    marginBottom: 12,
+  },
+
+  responseIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 13,
+    backgroundColor: "#28563A",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 11,
   },
 
   responseEmoji: {
     fontSize: 18,
-    marginRight: 9,
   },
 
   responseTextArea: {
     flex: 1,
   },
 
+  responseLabel: {
+    color: "#9FC0A7",
+    fontSize: 8,
+    fontWeight: "900",
+    letterSpacing: 0.9,
+    marginBottom: 3,
+  },
+
   responseTitle: {
-    color: "#14532D",
-    fontSize: 13,
+    color: "#FFFFFF",
+    fontSize: 12,
     fontWeight: "900",
     marginBottom: 4,
   },
 
   responseText: {
-    color: "#4B5563",
+    color: "#C9D9CC",
+    fontSize: 10,
+    lineHeight: 16,
+  },
+
+  lessonCard: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E1E7E1",
+    borderRadius: 18,
+    padding: 14,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 11,
+  },
+
+  lessonIcon: {
+    width: 39,
+    height: 39,
+    borderRadius: 12,
+    backgroundColor: "#F0F4ED",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 10,
+  },
+
+  lessonEmoji: {
+    fontSize: 17,
+  },
+
+  lessonTextArea: {
+    flex: 1,
+  },
+
+  lessonTitle: {
+    color: "#35473A",
     fontSize: 11,
-    lineHeight: 17,
+    fontWeight: "900",
+    marginBottom: 3,
+  },
+
+  lessonText: {
+    color: "#7B847D",
+    fontSize: 10,
+    lineHeight: 15,
+  },
+
+  habitCard: {
+    backgroundColor: "#EAF4EA",
+    borderRadius: 18,
+    padding: 14,
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+
+  habitEmoji: {
+    fontSize: 18,
+    marginRight: 10,
+  },
+
+  habitTextArea: {
+    flex: 1,
+  },
+
+  habitTitle: {
+    color: "#28563A",
+    fontSize: 11,
+    fontWeight: "900",
+    marginBottom: 3,
+  },
+
+  habitText: {
+    color: "#607067",
+    fontSize: 10,
+    lineHeight: 15,
+  },
+
+  bottomArea: {
+    marginTop: "auto",
+    paddingTop: 25,
+    paddingBottom: 8,
   },
 
   button: {
-    width: "100%",
-    minHeight: 56,
-    backgroundColor: "#14532D",
-    borderRadius: 18,
+    minHeight: 58,
+    backgroundColor: "#28623B",
+    borderRadius: 19,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 18,
-    marginTop: 4,
-    marginBottom: 10,
-
-    shadowColor: "#14532D",
-    shadowOpacity: 0.15,
-    shadowRadius: 9,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    elevation: 3,
+    paddingHorizontal: 20,
   },
 
   buttonDisabled: {
-    opacity: 0.35,
+    backgroundColor: "#C9D5CB",
   },
 
   buttonPressed: {
-    opacity: 0.88,
+    opacity: 0.9,
     transform: [{ scale: 0.99 }],
   },
 
   buttonText: {
     color: "#FFFFFF",
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: "900",
   },
 
   buttonArrow: {
     color: "#FFFFFF",
-    fontSize: 20,
+    fontSize: 21,
     fontWeight: "900",
-    marginLeft: 8,
+    marginLeft: 9,
+  },
+
+  bottomText: {
+    color: "#8A928C",
+    fontSize: 10,
+    lineHeight: 15,
+    textAlign: "center",
+    marginTop: 11,
+    paddingHorizontal: 15,
   },
 });

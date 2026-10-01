@@ -16,118 +16,144 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.container}>
+          {/* Brand */}
           <View style={styles.brandRow}>
-            <View style={styles.logoCircle}>
+            <View style={styles.logoBox}>
               <Text style={styles.logoEmoji}>🌿</Text>
             </View>
 
             <View>
               <Text style={styles.brandName}>CaatoAI</Text>
-              <Text style={styles.brandSubtitle}>Caafimaad kuu gaar ah</Text>
+              <Text style={styles.brandSubtitle}>
+                Isbeddel yar. Natiijo waarta.
+              </Text>
             </View>
           </View>
 
-          <View style={styles.coachBadge}>
-            <Text style={styles.coachBadgeText}>✨ Tababarahaaga AI</Text>
-          </View>
-
-          <View style={styles.heroArea}>
-            <View style={styles.welcomeIcon}>
-              <Text style={styles.welcomeEmoji}>👋</Text>
+          {/* Hero */}
+          <View style={styles.hero}>
+            <View style={styles.eyebrow}>
+              <Text style={styles.eyebrowText}>
+                ✨ SAFARKAAGA ADIGA AYUU KU BILAABMAA
+              </Text>
             </View>
 
-            <Text style={styles.welcomeText}>Salaan</Text>
-
-            <Text style={styles.heroTitle}>
-              Waxaan ahay <Text style={styles.heroHighlight}>CaatoAI.</Text>
+            <Text style={styles.title}>
+              Miisaanka oo keliya{"\n"}
+              <Text style={styles.titleGreen}>ma aha hadafka.</Text>
             </Text>
 
-            <Text style={styles.heroSubtitle}>
-              Waxaan kaa caawin doonaa inaad dhisto hab nololeed caafimaad leh
-              oo ku habboon cuntadaada, dhaq-dhaqaaqaaga iyo noloshaada.
-            </Text>
-          </View>
-
-          <View style={styles.messageCard}>
-            <Text style={styles.messageEmoji}>💚</Text>
-
-            <Text style={styles.messageTitle}>Ma aha cunto adag.</Text>
-
-            <Text style={styles.messageText}>
-              Uma baahnid inaad wax walba hal mar beddesho.
-            </Text>
-
-            <Text style={styles.messageText}>
-              Waxaan ku bilaabaynaa tallaabooyin yar-yar oo aad sii wadi karto.
+            <Text style={styles.subtitle}>
+              CaatoAI wuxuu kaa caawinayaa inaad fahanto cuntadaada,
+              caadooyinkaaga iyo waxa kaa hor istaaga hadafkaaga — kadibna
+              waxaan kula dhiseynaa isbeddel aad sii wadi karto.
             </Text>
           </View>
 
-          <View style={styles.whatHappensCard}>
-            <Text style={styles.smallLabel}>SAFARKAAGA</Text>
-
-            <View style={styles.journeyRow}>
-              <View style={styles.numberCircle}>
-                <Text style={styles.numberText}>1</Text>
+          {/* Main visual */}
+          <View style={styles.visualCard}>
+            <View style={styles.visualTop}>
+              <View style={styles.coachIcon}>
+                <Text style={styles.coachEmoji}>🌱</Text>
               </View>
 
-              <View style={styles.journeyTextArea}>
-                <Text style={styles.journeyTitle}>Waxaan ku baran doonaa</Text>
-                <Text style={styles.journeyText}>
-                  Hadafkaaga, caadooyinkaaga iyo waxa kuu adag.
+              <View style={styles.visualHeading}>
+                <Text style={styles.visualLabel}>CAATOAI</Text>
+                <Text style={styles.visualTitle}>
+                  Maalin kasta hal tallaabo
                 </Text>
               </View>
             </View>
 
-            <View style={styles.journeyLine} />
+            <Text style={styles.visualText}>
+              Ma doonayno inaad hal maalin wax walba beddesho. Waxaan rabnaa
+              inaan ogaano waxa adiga kuu shaqeeya.
+            </Text>
 
-            <View style={styles.journeyRow}>
-              <View style={styles.numberCircle}>
-                <Text style={styles.numberText}>2</Text>
+            <View style={styles.path}>
+              <View style={styles.pathItem}>
+                <View style={styles.pathIcon}>
+                  <Text style={styles.pathEmoji}>🧠</Text>
+                </View>
+
+                <View style={styles.pathTextArea}>
+                  <Text style={styles.pathTitle}>Faham caadooyinkaaga</Text>
+                  <Text style={styles.pathText}>
+                    Baro sababta aad wax u cunto iyo waxa kugu adkaada.
+                  </Text>
+                </View>
               </View>
 
-              <View style={styles.journeyTextArea}>
-                <Text style={styles.journeyTitle}>
-                  Waxaan kuu samayn doonaa qorshe
-                </Text>
-                <Text style={styles.journeyText}>
-                  Cunto, dhaq-dhaqaaq iyo caadooyin adiga kuu gaar ah.
-                </Text>
+              <View style={styles.connector} />
+
+              <View style={styles.pathItem}>
+                <View style={styles.pathIcon}>
+                  <Text style={styles.pathEmoji}>🍽️</Text>
+                </View>
+
+                <View style={styles.pathTextArea}>
+                  <Text style={styles.pathTitle}>
+                    Cun cuntada aad jeceshahay
+                  </Text>
+                  <Text style={styles.pathText}>
+                    Baro portions, protein iyo doorashooyin kuu shaqeeya.
+                  </Text>
+                </View>
               </View>
-            </View>
 
-            <View style={styles.journeyLine} />
+              <View style={styles.connector} />
 
-            <View style={styles.journeyRow}>
-              <View style={styles.numberCircle}>
-                <Text style={styles.numberText}>3</Text>
-              </View>
+              <View style={styles.pathItem}>
+                <View style={styles.pathIcon}>
+                  <Text style={styles.pathEmoji}>🌿</Text>
+                </View>
 
-              <View style={styles.journeyTextArea}>
-                <Text style={styles.journeyTitle}>
-                  Maalin kasta waan kula socon doonaa
-                </Text>
-                <Text style={styles.journeyText}>
-                  Casharro gaaban, check-ins iyo taageero joogto ah.
-                </Text>
+                <View style={styles.pathTextArea}>
+                  <Text style={styles.pathTitle}>Dhis caadooyin waara</Text>
+                  <Text style={styles.pathText}>
+                    Tallaabooyin yar-yar oo aad noloshaada ku sii wadi karto.
+                  </Text>
+                </View>
               </View>
             </View>
           </View>
 
+          {/* Reassurance */}
+          <View style={styles.reassuranceCard}>
+            <View style={styles.reassuranceIcon}>
+              <Text style={styles.heart}>💚</Text>
+            </View>
+
+            <View style={styles.reassuranceTextArea}>
+              <Text style={styles.reassuranceTitle}>Ma jiro cunto “xun.”</Text>
+
+              <Text style={styles.reassuranceText}>
+                CaatoAI wuxuu ku bari doonaa sida cuntada aad jeceshahay uga mid
+                noqon karto qorshahaaga.
+              </Text>
+            </View>
+          </View>
+
+          {/* Start */}
           <View style={styles.bottomArea}>
-            <Pressable
-              style={({ pressed }) => [
-                styles.primaryButton,
-                pressed && styles.primaryButtonPressed,
-              ]}
-              onPress={() => router.push("/onboarding")}
-            >
-              <Text style={styles.primaryButtonText}>Aan bilowno</Text>
+            <Text style={styles.readyText}>
+              Marka hore, aan wax yar kaa baranno.
+            </Text>
 
-              <Text style={styles.primaryButtonArrow}>→</Text>
+            <Pressable
+              onPress={() => router.push("/onboarding")}
+              style={({ pressed }) => [
+                styles.button,
+                pressed && styles.buttonPressed,
+              ]}
+            >
+              <Text style={styles.buttonText}>Bilow safarkayga</Text>
+              <Text style={styles.buttonArrow}>→</Text>
             </Pressable>
 
-            <Text style={styles.bottomText}>
-              Wax yar ayaan ku weydiin doonaa si aan kuu barto. 🌿
+            <Text style={styles.privacyText}>
+              🔒 Jawaabahaaga waxaa loo isticmaalaa in qorshahaaga laguu
+              waafajiyo.
             </Text>
           </View>
         </View>
@@ -139,256 +165,284 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#FFFBF5",
+    backgroundColor: "#FBF8F1",
   },
 
   scrollContent: {
     flexGrow: 1,
-    paddingVertical: 18,
+    paddingVertical: 20,
   },
 
   container: {
     width: "100%",
-    maxWidth: 540,
+    maxWidth: 560,
     alignSelf: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 22,
   },
 
   brandRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 24,
+    marginBottom: 34,
   },
 
-  logoCircle: {
-    width: 46,
-    height: 46,
-    borderRadius: 15,
-    backgroundColor: "#DCFCE7",
-    borderWidth: 1,
-    borderColor: "#BBF7D0",
+  logoBox: {
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    backgroundColor: "#E3F1E5",
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 11,
+    marginRight: 12,
   },
 
   logoEmoji: {
-    fontSize: 22,
+    fontSize: 23,
   },
 
   brandName: {
     fontSize: 22,
     fontWeight: "900",
-    color: "#14532D",
+    color: "#173F2A",
   },
 
   brandSubtitle: {
-    marginTop: 1,
-    fontSize: 10,
-    fontWeight: "700",
-    color: "#6B7280",
+    marginTop: 2,
+    fontSize: 11,
+    fontWeight: "600",
+    color: "#748078",
   },
 
-  coachBadge: {
+  hero: {
+    marginBottom: 25,
+  },
+
+  eyebrow: {
     alignSelf: "flex-start",
-    backgroundColor: "#ECFDF5",
-    borderWidth: 1,
-    borderColor: "#BBF7D0",
-    paddingHorizontal: 12,
+    backgroundColor: "#EAF4EA",
+    paddingHorizontal: 11,
     paddingVertical: 7,
     borderRadius: 999,
-    marginBottom: 18,
+    marginBottom: 15,
   },
 
-  coachBadgeText: {
-    color: "#166534",
-    fontSize: 11,
+  eyebrowText: {
+    color: "#3F6F4D",
+    fontSize: 9,
     fontWeight: "900",
+    letterSpacing: 0.7,
   },
 
-  heroArea: {
-    marginBottom: 22,
-  },
-
-  welcomeIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 18,
-    backgroundColor: "#F0FDF4",
-    borderWidth: 1,
-    borderColor: "#DCFCE7",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 14,
-  },
-
-  welcomeEmoji: {
-    fontSize: 28,
-  },
-
-  welcomeText: {
-    fontSize: 16,
-    fontWeight: "800",
-    color: "#166534",
-    marginBottom: 5,
-  },
-
-  heroTitle: {
-    fontSize: 33,
-    lineHeight: 39,
+  title: {
+    fontSize: 36,
+    lineHeight: 42,
     fontWeight: "900",
-    color: "#1F2937",
-    marginBottom: 12,
+    color: "#202923",
+    letterSpacing: -0.8,
   },
 
-  heroHighlight: {
-    color: "#14532D",
+  titleGreen: {
+    color: "#28623B",
   },
 
-  heroSubtitle: {
+  subtitle: {
+    marginTop: 15,
+    maxWidth: 500,
     fontSize: 15,
     lineHeight: 23,
-    color: "#6B7280",
+    color: "#667169",
   },
 
-  messageCard: {
-    backgroundColor: "#14532D",
-    borderRadius: 24,
-    padding: 20,
-    marginBottom: 16,
-  },
-
-  messageEmoji: {
-    fontSize: 22,
-    marginBottom: 10,
-  },
-
-  messageTitle: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "900",
-    marginBottom: 8,
-  },
-
-  messageText: {
-    color: "#DCFCE7",
-    fontSize: 13,
-    lineHeight: 20,
-    marginBottom: 4,
-  },
-
-  whatHappensCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: "#DDE8DE",
-    padding: 17,
-  },
-
-  smallLabel: {
-    color: "#166534",
-    fontSize: 10,
-    fontWeight: "900",
-    letterSpacing: 1.2,
+  visualCard: {
+    backgroundColor: "#173F2A",
+    borderRadius: 28,
+    padding: 21,
     marginBottom: 14,
   },
 
-  journeyRow: {
+  visualTop: {
     flexDirection: "row",
     alignItems: "center",
   },
 
-  numberCircle: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: "#DCFCE7",
+  coachIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    backgroundColor: "#2B583B",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
-    flexShrink: 0,
   },
 
-  numberText: {
-    color: "#14532D",
-    fontSize: 13,
-    fontWeight: "900",
+  coachEmoji: {
+    fontSize: 23,
   },
 
-  journeyTextArea: {
+  visualHeading: {
     flex: 1,
   },
 
-  journeyTitle: {
-    color: "#1F2937",
-    fontSize: 13,
+  visualLabel: {
+    color: "#9BC6A5",
+    fontSize: 9,
     fontWeight: "900",
+    letterSpacing: 1.2,
     marginBottom: 3,
   },
 
-  journeyText: {
-    color: "#6B7280",
+  visualTitle: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "900",
+  },
+
+  visualText: {
+    color: "#D7E7DA",
+    fontSize: 13,
+    lineHeight: 20,
+    marginTop: 16,
+    marginBottom: 20,
+  },
+
+  path: {
+    backgroundColor: "#204B32",
+    borderRadius: 21,
+    padding: 16,
+  },
+
+  pathItem: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  pathIcon: {
+    width: 39,
+    height: 39,
+    borderRadius: 13,
+    backgroundColor: "#315D40",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+
+  pathEmoji: {
+    fontSize: 18,
+  },
+
+  pathTextArea: {
+    flex: 1,
+  },
+
+  pathTitle: {
+    color: "#FFFFFF",
+    fontSize: 13,
+    fontWeight: "800",
+    marginBottom: 2,
+  },
+
+  pathText: {
+    color: "#C8DCCA",
     fontSize: 11,
     lineHeight: 16,
   },
 
-  journeyLine: {
+  connector: {
     width: 2,
-    height: 18,
-    backgroundColor: "#DCFCE7",
-    marginLeft: 16,
-    marginVertical: 3,
+    height: 13,
+    backgroundColor: "#4E755A",
+    marginLeft: 19,
+    marginVertical: 4,
+  },
+
+  reassuranceCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E0E7DF",
+    borderRadius: 20,
+    padding: 16,
+  },
+
+  reassuranceIcon: {
+    width: 43,
+    height: 43,
+    borderRadius: 14,
+    backgroundColor: "#EAF5EB",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+
+  heart: {
+    fontSize: 19,
+  },
+
+  reassuranceTextArea: {
+    flex: 1,
+  },
+
+  reassuranceTitle: {
+    color: "#243128",
+    fontSize: 14,
+    fontWeight: "900",
+    marginBottom: 3,
+  },
+
+  reassuranceText: {
+    color: "#707A73",
+    fontSize: 11,
+    lineHeight: 16,
   },
 
   bottomArea: {
-    marginTop: 18,
-    marginBottom: 8,
+    marginTop: 23,
+    marginBottom: 12,
   },
 
-  primaryButton: {
-    width: "100%",
-    minHeight: 56,
-    backgroundColor: "#14532D",
-    borderRadius: 18,
+  readyText: {
+    color: "#4D5B51",
+    fontSize: 13,
+    fontWeight: "700",
+    textAlign: "center",
+    marginBottom: 11,
+  },
+
+  button: {
+    minHeight: 58,
+    borderRadius: 19,
+    backgroundColor: "#28623B",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 18,
-
-    shadowColor: "#14532D",
-    shadowOpacity: 0.16,
-    shadowRadius: 10,
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-    elevation: 3,
+    paddingHorizontal: 20,
   },
 
-  primaryButtonPressed: {
-    opacity: 0.88,
+  buttonPressed: {
+    opacity: 0.9,
     transform: [{ scale: 0.99 }],
   },
 
-  primaryButtonText: {
+  buttonText: {
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "900",
   },
 
-  primaryButtonArrow: {
+  buttonArrow: {
     color: "#FFFFFF",
-    fontSize: 20,
+    fontSize: 21,
     fontWeight: "900",
-    marginLeft: 8,
+    marginLeft: 9,
   },
 
-  bottomText: {
-    marginTop: 12,
-    paddingHorizontal: 10,
-    color: "#6B7280",
-    fontSize: 11,
-    lineHeight: 17,
+  privacyText: {
+    color: "#8A928C",
+    fontSize: 10,
+    lineHeight: 15,
     textAlign: "center",
+    marginTop: 11,
+    paddingHorizontal: 18,
   },
 });

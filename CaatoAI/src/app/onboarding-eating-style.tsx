@@ -2,28 +2,50 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
-type EatingStyle = "regular" | "fasting" | "omad";
+type EatingStyle =
+  | "regular-meals"
+  | "skip-meals"
+  | "snacking"
+  | "night-eating"
+  | "changing-schedule";
 
-const eatingOptions = [
+const OPTIONS: {
+  id: EatingStyle;
+  emoji: string;
+  title: string;
+  description: string;
+}[] = [
   {
-    id: "regular" as EatingStyle,
+    id: "regular-meals",
     emoji: "🍽️",
-    title: "Qorshe caadi ah",
-    description:
-      "Waxaan rabaa cuntooyin iyo meals caadi ah maalintii anigoon fasting samayn.",
+    title: "Badanaa 3 jeer ayaan wax cunaa",
+    description: "Quraac, qado iyo casho ayaan inta badan leeyahay.",
   },
   {
-    id: "fasting" as EatingStyle,
-    emoji: "⏳",
-    title: "Intermittent Fasting",
+    id: "skip-meals",
+    emoji: "⏰",
+    title: "Mararka qaar cuntada waan ka boodaa",
     description:
-      "Waxaan rabaa inaan cunto ku koobnaado waqtiyo gaar ah oo maalinta ah.",
+      "Waxaan seegaa quraac, qado ama cunto kale marka aan mashquulo.",
   },
   {
-    id: "omad" as EatingStyle,
-    emoji: "🥣",
-    title: "OMAD",
-    description: "Waxaan doorbidayaa hal meal oo weyn maalintii.",
+    id: "snacking",
+    emoji: "🍎",
+    title: "Wax yar-yar ayaan marar badan cunaa",
+    description: "Snacks ama cunto yar ayaan cunaa dhowr jeer maalintii.",
+  },
+  {
+    id: "night-eating",
+    emoji: "🌙",
+    title: "Habeenkii ayaan wax badan cunaa",
+    description:
+      "Gaajada ama rabitaanka cuntadu badanaa habeenkii ayuu ii bato.",
+  },
+  {
+    id: "changing-schedule",
+    emoji: "🔄",
+    title: "Jadwalkayga cuntadu wuu is beddelaa",
+    description: "Maalin kasta isku waqti wax ma cuno.",
   },
 ];
 
@@ -32,79 +54,36 @@ export default function OnboardingEatingStyleScreen() {
 
   const name = typeof params.name === "string" ? params.name : "";
 
-  const breastfeeding =
-    typeof params.breastfeeding === "string"
-      ? params.breastfeeding
-      : "not-breastfeeding";
+  const [selected, setSelected] = useState<EatingStyle[]>([]);
 
-  const pregnant =
-    typeof params.pregnant === "string" ? params.pregnant === "true" : false;
+  const toggleOption = (id: EatingStyle) => {
+    setSelected((current) => {
+      if (current.includes(id)) {
+        return current.filter((item) => item !== id);
+      }
 
-  const womensHealthStatus =
-    typeof params.womensHealthStatus === "string"
-      ? params.womensHealthStatus
-      : "";
-
-  const healthNotDisclosed = womensHealthStatus === "prefer-not-to-say";
-
-  const fastingBlocked =
-    pregnant ||
-    breastfeeding === "partial" ||
-    breastfeeding === "exclusive" ||
-    healthNotDisclosed;
-
-  const [eatingStyle, setEatingStyle] = useState<EatingStyle | null>(
-    fastingBlocked ? "regular" : null,
-  );
-
-  const selectedStyle = eatingOptions.find((item) => item.id === eatingStyle);
-
-  const handleSelect = (style: EatingStyle) => {
-    if (fastingBlocked && (style === "fasting" || style === "omad")) {
-      return;
-    }
-
-    setEatingStyle(style);
-  };
-
-  const continueNext = () => {
-    if (!selectedStyle) return;
-
-    router.push({
-      // Temporary until we build the next onboarding screen.
-      pathname: "/onboarding-food-access",
-      params: {
-        ...params,
-        eatingStyle: selectedStyle.id,
-        eatingStyleLabel: selectedStyle.title,
-      },
+      return [...current, id];
     });
   };
 
-  const getCoachResponse = () => {
-    if (!selectedStyle) return null;
+  const canContinue = selected.length > 0;
 
-    if (selectedStyle.id === "regular") {
-      return {
-        title: "Qorshe caadi ah waa doorasho fiican.",
-        text: "CaatoAI wuxuu kaa caawin doonaa meals isku dheelitiran, protein ku filan iyo portions kuu shaqeeya adigoon fasting samayn.",
-      };
-    }
+  const continueNext = () => {
+    if (!canContinue) return;
 
-    if (selectedStyle.id === "fasting") {
-      return {
-        title: "Waxaan fasting-ka ka dhigi doonaa mid taxaddar leh.",
-        text: "CaatoAI ma isticmaali doono fasting-ka sidii tartan ama hab aad u cunto wax aad u yar. Waxaan diiradda saari doonaa jadwal aad dooratay iyo cunto ku filan marka aad wax cunayso.",
-      };
-    }
+    const labels = OPTIONS.filter((option) => selected.includes(option.id)).map(
+      (option) => option.title,
+    );
 
-    return {
-      title: "OMAD wuxuu u baahan yahay taxaddar dheeraad ah.",
-      text: "Haddii OMAD kuu habboon yahay, CaatoAI wuxuu hubin doonaa in meal-kaagu yahay mid nafaqo leh oo ku filan, halkii uu kaa dhiirrigelin lahaa inaad si xad dhaaf ah wax u yarayso.",
-    };
+    router.push({
+      pathname: "/onboarding-eating-behavior",
+      params: {
+        ...params,
+        eatingStyles: selected.join(","),
+        eatingStyleLabels: labels.join("|"),
+      },
+    });
   };
-
-  const coachResponse = getCoachResponse();
 
   return (
     <ScrollView
@@ -112,13 +91,33 @@ export default function OnboardingEatingStyleScreen() {
       contentContainerStyle={styles.scrollContent}
       showsVerticalScrollIndicator={false}
     >
-      <View style={styles.content}>
-        {/* Progress */}
-        <View style={styles.progressTrack}>
-          <View style={styles.progressFill} />
+      <View style={styles.container}>
+        {/* TOP */}
+
+        <View style={styles.topRow}>
+          <Pressable
+            onPress={() => router.back()}
+            style={({ pressed }) => [
+              styles.backButton,
+              pressed && styles.pressed,
+            ]}
+          >
+            <Text style={styles.backArrow}>‹</Text>
+          </Pressable>
+
+          <View style={styles.progressArea}>
+            <View style={styles.progressTrack}>
+              <View style={styles.progressFill} />
+            </View>
+
+            <Text style={styles.progressText}>
+              Waxaan kuu dhisaynaa qorshe kuu gaar ah
+            </Text>
+          </View>
         </View>
 
-        {/* Coach */}
+        {/* COACH */}
+
         <View style={styles.coachRow}>
           <View style={styles.coachIcon}>
             <Text style={styles.coachEmoji}>🌿</Text>
@@ -128,182 +127,178 @@ export default function OnboardingEatingStyleScreen() {
             <Text style={styles.coachName}>CaatoAI</Text>
 
             <Text style={styles.coachLabel}>
-              Qaabka cuntada waa inuu ku habboonaadaa noloshaada
+              Aan fahanno sida cuntadu maalintaada ugu jirto
             </Text>
           </View>
         </View>
 
-        <Text style={styles.smallGreeting}>
-          {name ? `${name}, ` : ""}
-          adiga ayaa dooranaya qaabka kuu shaqeeya 💚
-        </Text>
+        {/* PERSONAL MESSAGE */}
 
-        <Text style={styles.title}>
-          Sidee ayaad rabtaa{"\n"}
-          <Text style={styles.titleHighlight}>inaad u cunto?</Text>
-        </Text>
+        {name ? (
+          <View style={styles.personalCard}>
+            <Text style={styles.personalEmoji}>💚</Text>
 
-        <Text style={styles.subtitle}>
-          Dooro qaabka aad doorbidayso. CaatoAI wuxuu qorshaha cuntada ku
-          waafajin doonaa doorashadaada iyo xogta badbaadada ee aad hore u
-          bixisay.
-        </Text>
-
-        {fastingBlocked ? (
-          <View style={styles.blockedNotice}>
-            <Text style={styles.blockedEmoji}>🛡️</Text>
-
-            <View style={styles.blockedTextArea}>
-              <Text style={styles.blockedTitle}>
-                Fasting iyo OMAD hadda lama heli karo
-              </Text>
-
-              <Text style={styles.blockedText}>
-                {healthNotDisclosed
-                  ? "Sababta oo ah waxaad dooratay inaadan sheegin xaaladda uurka ama naasnuujinta, CaatoAI wuxuu hadda kuu bilaabi doonaa qorshe caadi ah oo taxaddar badan. Waxaad tan beddeli kartaa marka aad profile-kaaga cusboonaysiiso."
-                  : "Sababtoo ah waxaad sheegtay inaad uur leedahay ama naasnuujinayso, CaatoAI wuxuu kuu isticmaali doonaa qorshe caadi ah oo taxaddar badan."}
-              </Text>
-            </View>
+            <Text style={styles.personalText}>
+              {name}, ma jiro jadwal qof walba u shaqeeya. Waxaan rabnaa inaan
+              marka hore fahanno sida adigu hadda wax u cunto.
+            </Text>
           </View>
         ) : null}
 
-        {healthNotDisclosed && !fastingBlocked ? (
-          <View style={styles.cautionCard}>
-            <Text style={styles.cautionEmoji}>💛</Text>
+        {/* HERO */}
 
-            <View style={styles.cautionTextArea}>
-              <Text style={styles.cautionTitle}>
-                Xogta caafimaadka lama dhamaystirin
-              </Text>
-
-              <Text style={styles.cautionText}>
-                Waxaad weli dooran kartaa qaabka cuntada, laakiin qorshaha
-                caadiga ah ayaa ah doorashada ugu taxaddarka badan ilaa aad
-                profile-kaaga ka cusboonaysiiso xogtaas.
-              </Text>
-            </View>
+        <View style={styles.hero}>
+          <View style={styles.stepBadge}>
+            <Text style={styles.stepBadgeText}>CAADOOYINKA CUNTADA</Text>
           </View>
-        ) : null}
 
-        <View style={styles.options}>
-          {eatingOptions.map((item) => {
-            const selected = eatingStyle === item.id;
+          <Text style={styles.title}>
+            Sidee ayaad inta badan{"\n"}
+            <Text style={styles.titleGreen}>wax u cuntaa?</Text>
+          </Text>
 
-            const disabled =
-              fastingBlocked && (item.id === "fasting" || item.id === "omad");
+          <Text style={styles.subtitle}>
+            Dooro dhammaan kuwa ku khuseeya. Jawaab sax ama khalad ah ma jiro —
+            waxaan rabnaa inaan fahanno maalintaada caadiga ah.
+          </Text>
+
+          <View style={styles.multiBadge}>
+            <Text style={styles.multiBadgeText}>
+              ✓ Waxaad dooran kartaa dhowr
+            </Text>
+          </View>
+        </View>
+
+        {/* OPTIONS */}
+
+        <View style={styles.optionsArea}>
+          {OPTIONS.map((option) => {
+            const isSelected = selected.includes(option.id);
 
             return (
               <Pressable
-                key={item.id}
-                disabled={disabled}
-                onPress={() => handleSelect(item.id)}
-                style={[
+                key={option.id}
+                onPress={() => toggleOption(option.id)}
+                style={({ pressed }) => [
                   styles.optionCard,
-                  selected && styles.optionCardSelected,
-                  disabled && styles.optionCardDisabled,
+                  isSelected && styles.optionCardSelected,
+                  pressed && styles.optionPressed,
                 ]}
               >
                 <View
                   style={[
                     styles.optionIcon,
-                    selected && styles.optionIconSelected,
-                    disabled && styles.optionIconDisabled,
+                    isSelected && styles.optionIconSelected,
                   ]}
                 >
-                  <Text style={styles.optionEmoji}>{item.emoji}</Text>
+                  <Text style={styles.optionEmoji}>{option.emoji}</Text>
                 </View>
 
                 <View style={styles.optionTextArea}>
-                  <View style={styles.optionTitleRow}>
-                    <Text
-                      style={[
-                        styles.optionTitle,
-                        selected && styles.optionTitleSelected,
-                        disabled && styles.optionTitleDisabled,
-                      ]}
-                    >
-                      {item.title}
-                    </Text>
-
-                    {disabled ? <Text style={styles.lockText}>🔒</Text> : null}
-                  </View>
-
                   <Text
                     style={[
-                      styles.optionDescription,
-                      disabled && styles.optionDescriptionDisabled,
+                      styles.optionTitle,
+                      isSelected && styles.optionTitleSelected,
                     ]}
                   >
-                    {item.description}
+                    {option.title}
                   </Text>
 
-                  {disabled ? (
-                    <Text style={styles.unavailableText}>
-                      Hadda kuguma habboona
-                    </Text>
-                  ) : null}
+                  <Text style={styles.optionDescription}>
+                    {option.description}
+                  </Text>
                 </View>
 
                 <View
                   style={[
-                    styles.radio,
-                    selected && styles.radioSelected,
-                    disabled && styles.radioDisabled,
+                    styles.checkBox,
+                    isSelected && styles.checkBoxSelected,
                   ]}
                 >
-                  {selected ? <View style={styles.radioDot} /> : null}
+                  {isSelected && <Text style={styles.checkMark}>✓</Text>}
                 </View>
               </Pressable>
             );
           })}
         </View>
 
-        {coachResponse ? (
-          <View style={styles.responseCard}>
-            <Text style={styles.responseEmoji}>✨</Text>
+        {/* AI INSIGHT */}
 
-            <View style={styles.responseTextArea}>
-              <Text style={styles.responseTitle}>{coachResponse.title}</Text>
+        {selected.length > 0 && (
+          <View style={styles.aiCard}>
+            <View style={styles.aiIcon}>
+              <Text style={styles.aiEmoji}>🧠</Text>
+            </View>
 
-              <Text style={styles.responseText}>{coachResponse.text}</Text>
+            <View style={styles.aiTextArea}>
+              <Text style={styles.aiLabel}>CAATOAI</Text>
+
+              <Text style={styles.aiTitle}>Uma baahnid jadwal qumman</Text>
+
+              <Text style={styles.aiText}>
+                Waxaan qorshahaaga ku waafajin doonaa noloshaada. Tallaabada ugu
+                horreysa waa inaan fahanno waxa hadda dhacaya — kadib ayaan si
+                tartiib ah u dhiseynaa caadooyin kuu shaqeeya.
+              </Text>
             </View>
           </View>
-        ) : null}
+        )}
 
-        <View style={styles.safetyCard}>
-          <Text style={styles.safetyEmoji}>🌱</Text>
+        {/* LESSON */}
 
-          <View style={styles.safetyTextArea}>
-            <Text style={styles.safetyTitle}>
-              Cunista yar ma aha hadafka CaatoAI
+        <View style={styles.lessonCard}>
+          <View style={styles.lessonIcon}>
+            <Text style={styles.lessonEmoji}>🌱</Text>
+          </View>
+
+          <View style={styles.lessonTextArea}>
+            <Text style={styles.lessonTitle}>
+              Isbeddel yar ayaa ka fiican qorshe adag
             </Text>
 
-            <Text style={styles.safetyText}>
-              Hadafku waa inaad hesho qaab cunto oo aad sii wadi karto, aad
-              hesho nafaqo ku filan, oo aad si tartiib ah ugu shaqayso
-              hadafkaaga.
+            <Text style={styles.lessonText}>
+              Haddii jadwalkaaga cuntadu mararka qaar is beddelo, CaatoAI kuma
+              weydiin doono inaad hal maalin wax walba beddesho. Waxaan ka
+              bilaabi doonaa waxa kuu fudud.
             </Text>
           </View>
         </View>
 
+        {/* WHY */}
+
+        <View style={styles.whyCard}>
+          <Text style={styles.whyEmoji}>💡</Text>
+
+          <View style={styles.whyTextArea}>
+            <Text style={styles.whyTitle}>Maxaan tan kuu weydiinaynaa?</Text>
+
+            <Text style={styles.whyText}>
+              Qaabka aad hadda wax u cunto wuxuu naga caawinayaa inaan kuu
+              diyaarinno meal timing, reminders iyo talooyin noloshaada la
+              jaanqaadaya.
+            </Text>
+          </View>
+        </View>
+
+        {/* BUTTON */}
+
         <View style={styles.bottomArea}>
           <Pressable
-            disabled={!selectedStyle}
+            disabled={!canContinue}
             onPress={continueNext}
             style={({ pressed }) => [
               styles.button,
-              !selectedStyle && styles.buttonDisabled,
-              pressed && selectedStyle && styles.buttonPressed,
+              !canContinue && styles.buttonDisabled,
+              pressed && canContinue && styles.buttonPressed,
             ]}
           >
             <Text style={styles.buttonText}>Sii wad</Text>
-
             <Text style={styles.buttonArrow}>→</Text>
           </Pressable>
 
-          <Text style={styles.privacyText}>
-            🔒 Qaabka cuntadaada waa kuu gaar. Saaxiibbada ama challenges-ka
-            looma tusayo ilaa aad adigu doorato.
+          <Text style={styles.bottomText}>
+            💚 Ujeeddadu waa inaan fahanno caadooyinkaaga, ma aha inaan ku
+            xukumno.
           </Text>
         </View>
       </View>
@@ -314,58 +309,95 @@ export default function OnboardingEatingStyleScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#FFFBF5",
+    backgroundColor: "#FBF8F1",
   },
 
   scrollContent: {
     flexGrow: 1,
-    paddingVertical: 20,
+    paddingVertical: 18,
   },
 
-  content: {
+  container: {
     flexGrow: 1,
     width: "100%",
-    maxWidth: 540,
+    maxWidth: 560,
     alignSelf: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 22,
+  },
+
+  topRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 25,
+  },
+
+  backButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E2E8E2",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 13,
+  },
+
+  backArrow: {
+    color: "#173F2A",
+    fontSize: 30,
+    lineHeight: 31,
+    fontWeight: "500",
+    marginTop: -2,
+  },
+
+  pressed: {
+    opacity: 0.75,
+  },
+
+  progressArea: {
+    flex: 1,
   },
 
   progressTrack: {
-    width: "100%",
     height: 5,
+    backgroundColor: "#E2E7E2",
     borderRadius: 999,
-    backgroundColor: "#E5E7EB",
     overflow: "hidden",
-    marginBottom: 26,
   },
 
   progressFill: {
-    width: "89%",
+    width: "74%",
     height: "100%",
+    backgroundColor: "#4F7C5B",
     borderRadius: 999,
-    backgroundColor: "#16A34A",
+  },
+
+  progressText: {
+    color: "#8A938C",
+    fontSize: 9,
+    fontWeight: "700",
+    marginTop: 6,
   },
 
   coachRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 24,
+    marginBottom: 16,
   },
 
   coachIcon: {
-    width: 44,
-    height: 44,
+    width: 46,
+    height: 46,
     borderRadius: 15,
-    backgroundColor: "#DCFCE7",
-    borderWidth: 1,
-    borderColor: "#BBF7D0",
+    backgroundColor: "#E3F1E5",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 11,
   },
 
   coachEmoji: {
-    fontSize: 21,
+    fontSize: 22,
   },
 
   coachTextArea: {
@@ -373,117 +405,103 @@ const styles = StyleSheet.create({
   },
 
   coachName: {
-    color: "#14532D",
+    color: "#173F2A",
     fontSize: 15,
     fontWeight: "900",
   },
 
   coachLabel: {
-    color: "#6B7280",
-    fontSize: 11,
-    lineHeight: 16,
+    color: "#7B857E",
+    fontSize: 10,
+    lineHeight: 15,
     fontWeight: "600",
     marginTop: 2,
   },
 
-  smallGreeting: {
-    color: "#15803D",
-    fontSize: 13,
-    fontWeight: "800",
-    marginBottom: 8,
+  personalCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#EDF5EC",
+    borderRadius: 16,
+    padding: 13,
+    marginBottom: 21,
   },
 
-  title: {
-    color: "#1F2937",
-    fontSize: 32,
-    lineHeight: 39,
-    fontWeight: "900",
-    marginBottom: 11,
+  personalEmoji: {
+    fontSize: 17,
+    marginRight: 9,
   },
 
-  titleHighlight: {
-    color: "#14532D",
+  personalText: {
+    flex: 1,
+    color: "#52685A",
+    fontSize: 11,
+    lineHeight: 17,
+    fontWeight: "600",
   },
 
-  subtitle: {
-    color: "#6B7280",
-    fontSize: 14,
-    lineHeight: 21,
+  hero: {
     marginBottom: 18,
   },
 
-  blockedNotice: {
-    backgroundColor: "#F0FDF4",
-    borderWidth: 1,
-    borderColor: "#BBF7D0",
-    borderRadius: 18,
-    padding: 14,
-    flexDirection: "row",
+  stepBadge: {
+    alignSelf: "flex-start",
+    backgroundColor: "#EAF4EA",
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
     marginBottom: 12,
   },
 
-  blockedEmoji: {
-    fontSize: 18,
-    marginRight: 9,
-  },
-
-  blockedTextArea: {
-    flex: 1,
-  },
-
-  blockedTitle: {
-    color: "#14532D",
-    fontSize: 12,
+  stepBadgeText: {
+    color: "#477253",
+    fontSize: 9,
     fontWeight: "900",
-    marginBottom: 4,
+    letterSpacing: 0.8,
   },
 
-  blockedText: {
-    color: "#4B5563",
-    fontSize: 10,
-    lineHeight: 16,
-  },
-
-  cautionCard: {
-    backgroundColor: "#FFFBEB",
-    borderWidth: 1,
-    borderColor: "#FDE68A",
-    borderRadius: 18,
-    padding: 14,
-    flexDirection: "row",
-    marginBottom: 12,
-  },
-
-  cautionEmoji: {
-    fontSize: 18,
-    marginRight: 9,
-  },
-
-  cautionTextArea: {
-    flex: 1,
-  },
-
-  cautionTitle: {
-    color: "#92400E",
-    fontSize: 12,
+  title: {
+    color: "#202923",
+    fontSize: 30,
+    lineHeight: 37,
     fontWeight: "900",
-    marginBottom: 4,
+    letterSpacing: -0.6,
+    marginBottom: 11,
   },
 
-  cautionText: {
-    color: "#6B7280",
-    fontSize: 10,
-    lineHeight: 16,
+  titleGreen: {
+    color: "#28623B",
   },
 
-  options: {
+  subtitle: {
+    color: "#68736B",
+    fontSize: 14,
+    lineHeight: 21,
+  },
+
+  multiBadge: {
+    alignSelf: "flex-start",
+    backgroundColor: "#F0F4ED",
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginTop: 11,
+  },
+
+  multiBadgeText: {
+    color: "#657069",
+    fontSize: 9,
+    fontWeight: "800",
+  },
+
+  optionsArea: {
     gap: 10,
   },
 
   optionCard: {
     backgroundColor: "#FFFFFF",
     borderWidth: 1.5,
-    borderColor: "#DDE8DE",
+    borderColor: "#E0E6E0",
     borderRadius: 19,
     padding: 14,
     flexDirection: "row",
@@ -491,32 +509,26 @@ const styles = StyleSheet.create({
   },
 
   optionCardSelected: {
-    borderColor: "#16A34A",
-    backgroundColor: "#F0FDF4",
+    backgroundColor: "#F1F7F0",
+    borderColor: "#79A783",
   },
 
-  optionCardDisabled: {
-    backgroundColor: "#F9FAFB",
-    borderColor: "#E5E7EB",
-    opacity: 0.7,
+  optionPressed: {
+    opacity: 0.88,
   },
 
   optionIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 13,
-    backgroundColor: "#F3F4F6",
+    width: 45,
+    height: 45,
+    borderRadius: 14,
+    backgroundColor: "#F2F5F1",
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 11,
+    marginRight: 12,
   },
 
   optionIconSelected: {
-    backgroundColor: "#DCFCE7",
-  },
-
-  optionIconDisabled: {
-    backgroundColor: "#F3F4F6",
+    backgroundColor: "#DDEDDD",
   },
 
   optionEmoji: {
@@ -528,182 +540,209 @@ const styles = StyleSheet.create({
     paddingRight: 8,
   },
 
-  optionTitleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
   optionTitle: {
-    color: "#1F2937",
+    color: "#303A33",
     fontSize: 13,
     fontWeight: "900",
     marginBottom: 3,
   },
 
   optionTitleSelected: {
-    color: "#14532D",
-  },
-
-  optionTitleDisabled: {
-    color: "#9CA3AF",
-  },
-
-  lockText: {
-    fontSize: 11,
-    marginLeft: 6,
-    marginBottom: 3,
+    color: "#28563A",
   },
 
   optionDescription: {
-    color: "#6B7280",
+    color: "#818A83",
     fontSize: 10,
     lineHeight: 15,
   },
 
-  optionDescriptionDisabled: {
-    color: "#9CA3AF",
-  },
-
-  unavailableText: {
-    color: "#9CA3AF",
-    fontSize: 9,
-    fontWeight: "800",
-    marginTop: 5,
-  },
-
-  radio: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+  checkBox: {
+    width: 24,
+    height: 24,
+    borderRadius: 8,
     borderWidth: 2,
-    borderColor: "#D1D5DB",
+    borderColor: "#CCD4CD",
     alignItems: "center",
     justifyContent: "center",
   },
 
-  radioSelected: {
-    borderColor: "#16A34A",
+  checkBoxSelected: {
+    backgroundColor: "#4F7C5B",
+    borderColor: "#4F7C5B",
   },
 
-  radioDisabled: {
-    borderColor: "#E5E7EB",
-  },
-
-  radioDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#16A34A",
-  },
-
-  responseCard: {
-    backgroundColor: "#F0FDF4",
-    borderWidth: 1,
-    borderColor: "#BBF7D0",
-    borderRadius: 18,
-    padding: 14,
-    flexDirection: "row",
-    marginTop: 14,
-  },
-
-  responseEmoji: {
-    fontSize: 18,
-    marginRight: 9,
-  },
-
-  responseTextArea: {
-    flex: 1,
-  },
-
-  responseTitle: {
-    color: "#14532D",
+  checkMark: {
+    color: "#FFFFFF",
     fontSize: 13,
     fontWeight: "900",
-    marginBottom: 4,
   },
 
-  responseText: {
-    color: "#4B5563",
-    fontSize: 11,
-    lineHeight: 17,
-  },
-
-  safetyCard: {
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#DDE8DE",
-    borderRadius: 18,
-    padding: 14,
+  aiCard: {
+    marginTop: 13,
+    backgroundColor: "#173F2A",
+    borderRadius: 21,
+    padding: 15,
     flexDirection: "row",
-    marginTop: 12,
+    alignItems: "flex-start",
   },
 
-  safetyEmoji: {
+  aiIcon: {
+    width: 41,
+    height: 41,
+    borderRadius: 13,
+    backgroundColor: "#28563A",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 11,
+  },
+
+  aiEmoji: {
     fontSize: 18,
-    marginRight: 9,
   },
 
-  safetyTextArea: {
+  aiTextArea: {
     flex: 1,
   },
 
-  safetyTitle: {
-    color: "#1F2937",
+  aiLabel: {
+    color: "#9FC0A7",
+    fontSize: 8,
+    fontWeight: "900",
+    letterSpacing: 0.9,
+    marginBottom: 3,
+  },
+
+  aiTitle: {
+    color: "#FFFFFF",
     fontSize: 12,
     fontWeight: "900",
     marginBottom: 4,
   },
 
-  safetyText: {
-    color: "#6B7280",
+  aiText: {
+    color: "#C9D9CC",
     fontSize: 10,
     lineHeight: 16,
+  },
+
+  lessonCard: {
+    marginTop: 11,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E1E7E1",
+    borderRadius: 18,
+    padding: 14,
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+
+  lessonIcon: {
+    width: 39,
+    height: 39,
+    borderRadius: 12,
+    backgroundColor: "#F0F4ED",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 10,
+  },
+
+  lessonEmoji: {
+    fontSize: 17,
+  },
+
+  lessonTextArea: {
+    flex: 1,
+  },
+
+  lessonTitle: {
+    color: "#35473A",
+    fontSize: 11,
+    fontWeight: "900",
+    marginBottom: 3,
+  },
+
+  lessonText: {
+    color: "#7B847D",
+    fontSize: 10,
+    lineHeight: 15,
+  },
+
+  whyCard: {
+    marginTop: 11,
+    backgroundColor: "#EAF4EA",
+    borderRadius: 18,
+    padding: 14,
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+
+  whyEmoji: {
+    fontSize: 17,
+    marginRight: 10,
+  },
+
+  whyTextArea: {
+    flex: 1,
+  },
+
+  whyTitle: {
+    color: "#28563A",
+    fontSize: 11,
+    fontWeight: "900",
+    marginBottom: 3,
+  },
+
+  whyText: {
+    color: "#607067",
+    fontSize: 10,
+    lineHeight: 15,
   },
 
   bottomArea: {
     marginTop: "auto",
     paddingTop: 25,
+    paddingBottom: 8,
   },
 
   button: {
-    width: "100%",
-    minHeight: 56,
-    backgroundColor: "#14532D",
-    borderRadius: 18,
+    minHeight: 58,
+    backgroundColor: "#28623B",
+    borderRadius: 19,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: 20,
   },
 
   buttonDisabled: {
-    opacity: 0.35,
+    backgroundColor: "#C9D5CB",
   },
 
   buttonPressed: {
-    opacity: 0.88,
+    opacity: 0.9,
     transform: [{ scale: 0.99 }],
   },
 
   buttonText: {
     color: "#FFFFFF",
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: "900",
   },
 
   buttonArrow: {
     color: "#FFFFFF",
-    fontSize: 20,
+    fontSize: 21,
     fontWeight: "900",
-    marginLeft: 8,
+    marginLeft: 9,
   },
 
-  privacyText: {
-    marginTop: 13,
-    paddingHorizontal: 12,
-    textAlign: "center",
-    color: "#6B7280",
+  bottomText: {
+    color: "#8A928C",
     fontSize: 10,
-    lineHeight: 16,
-    fontWeight: "600",
+    lineHeight: 15,
+    textAlign: "center",
+    marginTop: 11,
+    paddingHorizontal: 15,
   },
 });
